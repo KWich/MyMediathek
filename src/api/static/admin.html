@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MyMediathek: Verwaltung</title>
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <link rel="stylesheet" href="css/kw.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <header id="vheader" class="color_fl">
+    <div class="kflexbar">
+      <h1 id="toptitle">MyMediathek: Verwaltung</h1>
+      <div id="topversion" class="top-right"></div>
+    </div>
+    <div id="a_back" class="kbar klist">
+      <button id="catback">Zurück</button>
+    </div>
+  </header>
+
+
+  <div id="msgpopuperr" class="popuperr"></div>
+
+  <section id="Stats">
+    <article>
+      <div>
+        <h2 class="container title">Datenbankstatistik:</h2>
+        <article>
+          <div id="merkliste" class="card">
+            <h4 id="merknb" class="container title"></h4>
+            <img src="images/down-nofill.svg"/>
+            <div id="aext" class="container"></div>
+          </div>
+        </article>
+        <article>
+          <div  id="catnb" class="card">
+            <h4 id="catuse" class="container title"></h4>
+            <img src="images/down-nofill.svg"/>
+            <div id="aext" class="container"></div>
+          </div>
+        </article>
+        <article>
+          <div class="card">
+            <h4 id="catnouse" class="container title"></h4>
+            <img src="images/down-nofill.svg"/>
+            <div id="aext" class="container">
+              <div class="container" id="admKategorieListe"></div>
+              <button id="deluncat" type="button" class="round-large">Unbenutzte löschen</button>
+            </div>
+          </div>
+        </article>
+        <article>
+          <div class="card">
+            <h4 id="moviestate" class="container title"></h4>
+            <img src="images/down-nofill.svg"/>
+            <div id="aext" class="container">
+              <table>
+                <tbody id="msstat">
+                </tbody>
+              </table>
+              <button id="deloldmstate" type="button" class="round-large">Alte Einträge löschen</button>
+            </div>
+          </div>
+        </article>
+        <div class="flexcard">
+          <button id="refreshBtn" type="button" class="listbtn cardright">Aktualisieren</button>
+        </div>
+      </div>
+    </article>
+  </section>
+
+
+  <section id="sPlayers">
+    <article>
+      <div>
+        <div class="flexcard">
+          <h2 class="container title">Konfigurierte Player:</h2>
+          <button id="addPlayer" class="cardright"><img src="images/plus.svg" id="addPlayerImg"/></button>
+        </div>
+        <article id="playerlist"></article>
+        <div class="leer">&nbsp;</div>
+      </div>
+    </article>
+  </section>
+
+
+  <section id="sFilter">
+    <article>
+      <div>
+        <h2 class="container title">Suchfilter:</h2>
+        <article>
+          <div class="card">
+            <h4 class="container title">Durchsuchte Sender:</h4>
+            <div class="container">
+              <div class="container" id="defaultStationList"></div>
+            </div>
+            <button class="cardright cardBtn">
+              <img src="images/gear-blue.svg">
+            </button>
+          </div>
+        </article>
+        <article>
+          <div class="card">
+            <h4 class="container title">Titelfilter:</h4>
+            <div class="container">
+              <div class="container" id="titleFilterList"></div>
+            </div>
+            <button class="cardright cardBtn">
+              <img src="images/gear-blue.svg">
+            </button>
+          </div>
+        </article>
+        <article>
+          <div class="card">
+            <h4 class="container title">Themenfilter:</h4>
+            <div class="container">
+              <div class="container" id="topicFilterList"></div>
+            </div>
+            <button class="cardright cardBtn">
+              <img src="images/gear-blue.svg">
+            </button>
+          </div>
+        </article>
+      </div>
+    </article>
+  </section>
+
+
+  <section id="Downloads">
+    <article>
+      <div>
+        <h2 class="container title">Erweiterungen:</h2>
+        <article>
+          <form class="card">
+              <div>Firefox Browser Add-on</div>
+              <button type="submit" formaction="addon/Merkliste-0.5.xpi" class="listbtn cardright">herunterladen</button>
+          </form>
+        </article>
+        <div class="leer">&nbsp;</div>
+      </div>
+    </article>
+  </section>
+
+  <dialog id="dlgm_setPlayer">
+    <div class="dialog-content">
+      <h3 class="container color_fl">Player Konfiguration:</h3>
+      <div id="msgpopupcdlg1" class="popinline"></div>
+      <div class="container">
+        <div id="addrDisplay">
+          <label>Adresse:Port</label><label>192,x,x,x:</label>
+        </div>
+        <div class="field-wrap">
+            <label for="pName">Anzeigename:</label>
+            <input id="pName" placeholder="Playername" type="text" name="Playername">
+        </div>
+        <label for="pTypSelect">Typ:</label>
+        <select id="pTypSelect">
+          <option>Kodi</option>
+          <option>VlC</option>
+        </select>
+        <div id="addrInput">
+          <div class="field-wrap">
+          <label for="mAdresse">Adresse:</label>
+          <input id="mAdresse" placeholder="e.g. 192.168.1.10 or localhost" type="text">
+          </div>
+          <label for="mPort">Port</label>
+          <input id="mPort" placeholder="Playerport" type="text">
+        </div>
+        <div class="field-wrap">
+          <label for="pAuth">Authentification:</label>
+          <input id="pAuth" placeholder="userid:password" type="text">
+        </div>
+        <label for="cbDefault">Als Standardplayer setzen:</label>
+        <input type="checkbox" id="cbDefault" name="cbDefault" value="Default">
+      </div>
+      <footer class="color_fl dfooter">
+        <button onclick="document.getElementById('dlgm_setPlayer').style.display='none'" type="button" class="cancelBtn">Abbruch</button>
+        <button id="mNewPlayerButton" class="cardrightSave">Speichern</button>
+        <button id="mTestPlayerButton" class="cardright cancelBtn">Teste Verbindung</button>
+      </footer>
+    </div>
+  </dialog>
+  
+  <dialog id="dlgm_editFilter">
+    <div class="dialog-content">
+      <h3 id="dlgfiltertitle" class="container color_fl">Filter Konfiguration:</h3>
+      <div id="msgpopupcdlg2" class="popinline"></div>
+      <div id="dlgfilterlist">
+      </div>
+      <footer class="color_ml">
+        <div class="topbtnbar">
+          <label>Neuer Filter:</label>
+        </div>
+        <div class="kflexbar">
+          <input id="mNewFilterName" placeholder="Filter" type="text">
+          <button id="mNewFilterButton" class="newCatButton">Hinzufügen</button>
+        </div>
+      </footer>
+      <footer class="color_fl dfooter">
+        <button onclick="document.getElementById('dlgm_editFilter').style.display='none'" type="button" class="cancelBtn">Schließen</button>
+        <button id="mSaveFiltersButton" class="cardrightSave">Speichern</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- info -->
+  <div id="msgpopup" class="popup"></div>
+
+  <!-- wait -->
+  <img id="wait" src="images/wait.svg" style="display: none;"/>
+
+</body>
+
+<script type="module" src="js/admin.js"></script>
+
+</html>

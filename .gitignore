@@ -1,0 +1,6 @@
+env/
+data/
+node_modules/
+release/
+**/__pycache__/
+package-lock.json

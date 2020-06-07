@@ -1,0 +1,884 @@
+swagger: "2.0"
+info:
+  version: "0.9"
+  title: "MyMediathek"
+  description: "Interface to synchronize and provide bookmarked movies and handle movies."
+basePath: "/api"
+tags:
+- name: "Info"
+  description: "General service info and statistics"
+- name: "Bookmarks"
+  description: "Bookmark handling, create, delete, get ..."
+- name: "Categories"
+  description: "Bookmark category handling"
+- name: "Moviestate"
+  description: "Handle the state of movies, like seen and bookmarked. Allows state information to be read and updated for display."
+- name: "Subscription"
+  description: "Handle movie subscriptions, create, delete, get ..." 
+
+
+schemes:
+- "http"
+- "https"
+
+paths:
+  /info:
+    get:
+      tags:
+      - "Info"
+      summary: "Get information and configuration data"
+      description: "Returns configuration data stored on the server, incuding player list and version info."
+      operationId: "api.interface.info_get" 
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            properties:
+              name:
+                type: "string"
+              version:
+                type: "string"
+              defaultplayer:
+                type: "integer"
+              players:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    name:
+                      type: "string"
+                    type:
+                      type: "string"
+                    address:
+                      type: "string"
+                    port:
+                      type: "integer"
+              config:
+                type: "object"
+                properties:
+                  searchChannelInclude:
+                    type: "array"
+                    items:
+                      type: "string"
+                      description: "Name of channels to include in search. Empty means all"
+                  searchTitleFilter:
+                    type: "array"
+                    items:
+                      type: "string"
+                      description: "Name of titles to exclude, if match"
+                  searchTopicFilter:
+                    type: "array"
+                    items:
+                      type: "string"
+                      description: "Name of topic to exclude, if match"
+                  minMovieStateAge:
+                    type: "integer"
+                    description: "Minimum age in days, before unused movie state can be deleted"
+                  expiryWarningDays:
+                    type: "integer"
+                    description: "Number of days before expiry day, a movie gets a warning"
+                
+            example: 
+              { "name": "MyMediathek Server", "version": "0.9.0", "defaultplayer": -1, "players": [], "config": {"searchChannelInclude": ["ARD", "ZDF"],  "searchTitleFilter" : [], "searchTopicFilter": [], "minMovieStateAge" : 183, "expiryWarningDays" : 5}}
+
+
+  /info/config:
+    patch:
+      tags:
+      - "Info"
+      summary: "Change config data on server"
+      operationId: "api.interface.info_config_patch"
+      consumes:
+      - application/json
+      parameters:
+      - in: "body"
+        name: "config"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            name:
+              type: "string"
+              description: "A valid config parameter name"
+              enum: [minMovieStateAge, expiryWarningDays, searchChannelInclude, searchTitleFilter, searchTopicFilter]
+            value:
+              type: "string"
+      responses:
+        "204":
+          description: "successful operation"
+      
+      
+   
+  /info/statistics:
+    get:
+      tags:
+      - "Info"
+      summary: "Get Server statistics"
+      description: "Get details of stored data"
+      operationId: "api.interface.info_statistics_get" 
+      parameters:
+      - name: "daysbefore"
+        in: "query"
+        description: "Number of days before current date for moviestate calculation."
+        type: "integer"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            properties:
+              tables:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    name:
+                      type: "string"
+                    nb:
+                      type: "integer"
+              bookmarks:
+                type: "object"
+                properties:
+                  number:
+                    type: integer
+                  station:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        name:
+                          type: "string"
+                        nb:
+                          type: "integer"
+                  categories:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        name:
+                          type: "string"
+                        nb:
+                          type: "integer"
+              moviestate:
+                type: "object"
+                properties:
+                  bookmarked:
+                    type: integer
+                  bookmarkedactual:
+                    type: integer
+                  bookmarkedold:
+                    type: integer
+                  oldnotbookmarked:
+                    type: integer
+                  oldtotal:
+                    type: integer
+                  total:
+                    type: integer
+
+  
+  /bookmarks:
+    post:
+      tags:
+      - "Bookmarks"
+      summary: "Add new bookmark(s)"
+      operationId: "api.bookmark.bookmarks_post"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "bookmarks"
+        description: "Array of bookmark object(s) to be added to the database.<br>If an element already exists it will be overwritten if the modification date is older, otherwise the entry is ignored.<br>If mandatory elements are missing, an error is returned."
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/bookmark"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            properties:
+              nb:
+                description: "Number of added bookmarks"
+                type: "integer"
+              detail:
+                type: "array"
+                items:
+                  properties:
+                    id:
+                      type: "integer"
+                      format: "int64"
+                      description: "Bookmark id from request. Java hash value of sender and url:<br>(java) int id = (sender + url).hashCode().abs()"
+                    expiry:
+                      type: "integer"
+                      description: "Expiry time stamp in seconds since since Jan 01 1970. If no expiry is set the value is 2000000000." 
+        "400":
+          description: "Invalid request, e.g. body syntax wrong"
+        "422":
+          description: "Invalid data , e.g. invalid date like 0.20.2020"
+
+    get:
+      tags:
+      - "Bookmarks"
+      summary: "Retrieve bookmarks"
+      description: "If no bookmarks are found an empty response is returned.<br><br>Optional filters:<ul><li>A category name can be specified as query parameter (e.g. '/bookmarks?category=China'), to retrieve only bookmarks with the requested category. If the category does not exit an error is returned, if no bookmarks with the category exist, an empty list is returned.</li><li>Sender name: It can be filtered with a optional sender name.</li></ul><b>Note: the filters can not be combined!</b><br><br>The optional sort parameter can be specified to force a sort, the direction can be inverted by setting the sub parameter desc."
+      operationId: "api.bookmark.bookmarks_get"
+      parameters:
+      - name: "category"
+        in: "query"
+        description: "optional bookmark category, to retrieve movies without category use special value '@NULL'"
+        type: "string"
+      - name: "sender"
+        in: "query"
+        description: "optional sender name, to retrieve only bookmarks for a specific sender"
+        type: "string"
+      - name: "sort"
+        in: "query"
+        description: "Sort order (optional)<br>
+          Possible values are<br>
+          * date: Sort by send date (and title)<br>
+          * duration: Sort by duration (and title)<br>
+          * expiry: Sort by expiry date (and title)<br>
+          * theme: Sort by theme (and title)<br>
+          * title: Sort by title"
+        type: "string"
+        enum: 
+          - date
+          - duration
+          - expiry
+          - theme
+          - title
+      - name: "desc"
+        in: "query"
+        description: "sort direction (only valid with sort)"
+        type: "boolean"
+      - name: "limit"
+        in: "query"
+        description: "number of records to return"
+        type: "integer"
+      - name: "offset"
+        in: "query"
+        description: "offset for first value to return "
+        type: "integer"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/bookmark"
+        "404":
+          description: "Invalid query parameter"
+
+  /bookmarks/delete:
+    post:
+      tags:
+      - "Bookmarks"
+      summary: "Delete bookmark(s) with given ids"
+      operationId: "api.bookmark.bookmarks_delete"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "ids"
+        description: "Array of bookmark id(s) to be removed from the database"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/id"
+      responses:
+        "204":
+          description: "Successful operation"
+        "400":
+          description: "Not supported body"
+        "404":
+          description: "No records deleted"
+        "500":
+          description: "Intenal error"
+          
+  /bookmarks/{id}:
+    delete:
+      tags:
+      - "Bookmarks"
+      summary: "Delete given bookmark"
+      description: ""
+      operationId: "api.bookmark.bookmarks_byId_delete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "bookmark id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+                format: "int64"
+                description: "Bookmark id from request. Java hash value of sender and url:<br>(java) int id = (sender + url).hashCode().abs()"
+              deleted:
+                type: boolean
+                description: True, means record was deleted
+            example:
+              { 'id': 1317922529 , 'deleted': true}
+            
+        "404":
+          description: "bookmark not found"
+  
+    get:
+      tags:
+      - "Bookmarks"
+      summary: "Get bookmark"
+      description: "Get data for given bookmark."
+      operationId: "api.bookmark.bookmarks_byId_get"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the bookmark"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/bookmark"
+        "404":
+          description: "bookmark not found"
+        "422":
+          description: "value error"
+
+    patch:
+      tags:
+      - "Bookmarks"
+      summary: "Set additional bookmark information"
+      description: "Set information parameters (e.g. category, expiry date) for given bookmark id."
+      operationId: "api.bookmark.bookmarks_byId_patch"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the bookmark to update"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "patches"
+        description: "Array of JSON patch definitions (RFC6902)"
+        schema:
+          type: "array"
+          items:
+            type: object
+            properties:
+              op:
+                type: string
+                enum: [replace, remove]
+                description: "patch operation, only replace and remove are supported"
+              name:
+                type: string
+                enum: [category, imgurl, videoformat, expiry] 
+                description: "parameter name to be modified"
+              value:
+                type: string
+                description: "new parameter value, empty for remove"
+
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              success:
+                type: boolean
+              errmsg:
+                type: string
+        "404":
+          description: "bookmark not found"
+        "422":
+          description: "Invalid data , e.g. invalid date like 0.20.2020"
+        "500":
+          description: "player error, e.g. no player configured"
+
+  /bookmarks/{id}/seen:
+    patch:
+      tags:
+      - "Bookmarks"
+      summary: "Set bookmark seen information"
+      description: "Set bookmark seen state to 'True' or 'False'"
+      operationId: "api.bookmark.bookmarks_byId_seen_patch"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the bookmark to update"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "seen"
+        in: "query"
+        description: "seen state"
+        required: true
+        type: "boolean"
+ 
+      responses:
+        "204":
+          description: "successful operation"
+
+
+  /bookmarks/{id}/expiry:
+    get:
+      tags:
+      - "Bookmarks"
+      summary: "Get bookmark expiry date from the webpage."
+      description: "Get expiry date for given bookmark id from the webpage."
+      operationId: "api.bookmark.bookmarks_byId_expiry_get"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the bookmark"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            properties:
+              expiry:
+                type: "integer"
+                description: "Expiry time stamp in seconds since since Jan 01 1970."
+            example:
+             {"expiry" : 1636758000 }
+              
+        "404":
+          description: "bookmark not found"
+        "422":
+          description: "value error"
+
+  /moviestate:
+    get:
+      tags:
+        - "Moviestate"
+      summary: Returns a list of moviestates
+      description: Returns moviestate<p>Optional filter parameter "before" can be used to return onlymoviestates older than the given date time stamp.<p>
+      operationId: api.interface.moviestate_get
+      parameters:
+        - name: before
+          in: query
+          description: timestamp as filter
+          type: integer
+        - name: "limit"
+          in: "query"
+          description: "number of records to return"
+          type: "integer"
+        - name: "offset"
+          in: "query"
+          description: "offset for first value to return "
+          type: "integer"
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/moviestate"
+            
+    post:
+      tags:
+      - "Moviestate"
+      summary: "Get multiple states with ids"
+      operationId: "api.interface.moviestate_post"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "ids"
+        description: "Array of ids to be querried."
+        required: true
+        schema:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+          example: [234323311, 456456454, 774343234]
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+             $ref: "#/definitions/moviestate"
+        "400":
+          description: "Invalid data"
+
+    delete:
+      tags:
+      - "Moviestate"
+      summary: "Delete movie states older than a given days"
+      description: "Delete movie states older days before current date. If the difference to today is less than 14 days the force flag must be set in the query."
+      operationId: "api.interface.moviestate_delete"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "daysbefore"
+        in: "query"
+        description: "Number of days before current date. If ommited a default from 183 days is assumed."
+        type: "integer"
+      - name: "force"
+        in: "query"
+        description: "Force flag"
+        required: false
+        type: "boolean"
+      responses:
+        "200":
+          description: "successful operation
+          schema:
+            $ref: "#/definitions/moviestate"
+  
+  /moviestate/{id}:
+    get:
+      tags:
+        - "Moviestate"
+      summary: Return a movie state. 
+      description: Returns the current state for the given id.
+      operationId: api.interface.moviestate_id_get
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Hash ID of the movie"
+        required: true
+        type: "integer"
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: "#/definitions/moviestate"
+        '404':
+          description: "id not found"
+            
+    patch:
+      tags:
+      - "Moviestate"
+      summary: "Update/create state of movie"
+      description: "Updates or creates a new entry in moviestate list for the given id, always returns success."
+      operationId: "api.interface.moviestate_id_patch"
+      consumes:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Hash ID of the movie to be updated/created in the movie state table"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "seen"
+        in: "query"
+        description: "Seen state of the movie"
+        type: "boolean"
+        default: false
+      responses:
+        "200":
+          description: "successful operation
+          schema:
+            $ref: "#/definitions/moviestate"
+
+  /categories:
+    get:
+      tags:
+        - "Categories"
+      summary: Returns a list of category names with the number of entries
+      description: Returns the names of available categories with the number of entries in the book mark list.<p>Optional filter parameter min or max number can be used to return only categories with at least min resp. max number of entries.<p>
+        <b>Note Only one filter can be applied in one call!</b><p>Returns an empty list if no (matching) categories are found.
+      operationId: api.interface.categories_get
+      parameters:
+        - name: min
+          in: query
+          description: min number of entries as filter
+          type: integer
+        - name: max
+          in: query
+          description: max number of entries as filter
+          type: integer
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                nb:
+                  type: integer
+
+  /categories/{name}:
+    delete:
+      tags:
+        - "Categories"
+      summary: Delete given category
+      description: ''
+      operationId: api.interface.categories_byname_delete
+      parameters:
+        - name: name
+          in: path
+          description: name of the category to delete
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+        '403':
+          description: Category is in use
+        '404':
+          description: Category not found
+
+
+  /player: 
+    post:
+      tags:
+      - Player
+      summary: Add new player
+      description: Add a new or modify an existing player.
+      operationId: api.interface.player_new
+      consumes:
+      - application/json
+      parameters:
+      - in: "body"
+        name: "player"
+        description: "Definition of player to added"
+        required: true
+        schema:
+          type: "object"
+          required:
+            - address
+            - port
+          properties:
+            address:
+              type: "string"
+              description: Either an IP address or a valid netowrk name like 'localhost'
+            port:
+              type: "integer"
+            name:
+              type: "string"
+              description: If name is ommited, 'address:port' is used as name.
+            type:
+              type: "string"
+            authentification:
+              type: "string"
+              description: "Authentification parameters to be used. Attention these parameters are visible in the network"
+            default:
+              type: "boolean"
+              description: "Mark this player as default. Note: The first player created will always be marked as default, even if this flag is not set."
+
+          example: {"address": "localhost", "port": 8090, name: "KODI lokal", "type": "kodi"}
+      responses:
+        "204":
+          description: "successful operation"
+        "400":
+          description: "Invalid request, e.g. body syntax wrong"
+        "422":
+          description: "Invalid data"
+
+  /player/{playerid}:
+    delete:
+      tags:
+        - Player
+      summary: Delete given player
+      description: ''
+      operationId: api.interface.player_delete
+      parameters:
+        - name: playerid
+          in: path
+          description: Id of player to be deleted
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+        '404':
+          description: Player not found
+
+  /player/{playerid}/test:
+    get:
+      tags:
+        - Player
+      summary: test the player connection and return result
+      description: ''
+      operationId: api.interface.player_test
+      parameters:
+        - name: playerid
+          in: path
+          description: Id of player
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Test was executed, result returned in JSON
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: boolean
+                description: "True if player could be successfully reached, False if an error occured"
+              detail:
+                type: "string"
+                description: "Explanation of status"
+            example:
+             {"success" : False, "detail": "No connection to player" }
+        '404':
+          description: Player ID not found
+
+
+  /player/play:
+    post:
+      tags:
+      - Player
+      summary: Play URL
+      operationId: api.interface.player_play
+      consumes:
+      - application/json
+      parameters:
+      - name: playerid
+        in: query
+        type: string
+      - name: movie"
+        in: body
+        description: Movie address to be played
+        schema:
+          type: object
+          required: 
+            - url
+          properties:
+            url:
+              type: string
+            title:
+              type: string
+            timestamp:
+              type: "integer"
+              description: "Start time stamp in seconds since since Jan 01 1970. Used to prevent double starts. If time stamp before current time, request will be denied wit 425"
+      responses:
+        200:
+          description: successful operation
+        400:
+          description: Invalid data
+        425:
+          description: (Assumed)) Double start denied
+        500:
+          description: player error, e.g. no player configured
+
+
+definitions:
+
+  bookmark:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        description: "Java hash value of sender and url:<br>(java) int id = (sender + url).hashCode().abs()"
+      modified:
+        type: "integer"
+        description: "Last modification time stamp in format 'yyyymmddhhmmss'"
+      sender:
+        type: "string"
+      thema:
+        type: "string"
+        x-nullable: true
+      titel:
+        type: "string"
+        x-nullable: true
+      category:
+        type: "string"
+        x-nullable: true
+      url:
+        type: "string"
+      description:
+        type: "string"
+        x-nullable: true
+      duration:
+        type: "integer"
+        description: "movie length in seconds"
+      sendDate:
+        type: "string"
+        x-nullable: true
+      seen:
+        type: "boolean"
+        default: false
+      expiry:
+        type: "integer"
+      note:
+        type: "string"
+        x-nullable: true
+      website:
+        type: "string"
+        x-nullable: true
+        description: "Url of mediathek website for this movie"
+      imgurl:
+        type: "string"
+        x-nullable: true
+        description: "movie image URL in mediathek"
+      videoformat:
+        type: "string"
+        x-nullable: true
+        description: "video format e.g. 720p, 1080p"
+
+  moviestate:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        description: "Java hash value of sender and url:<br>(java) int id = (sender + url).hashCode().abs()"
+      seen:
+        type: "boolean"
+        default: false
+        description: "indicates if the movie is seen"
+      bookmarked:
+        type: "boolean"
+        default: false
+        description: "indicates if the movie is in the bookmark table"
+      expiry:
+        type: "integer"
+        description: "Expiry time stamp in seconds since since Jan 01 1970. If no expiry is set the value is 5000000000." 
+    example: {"id" : 234323311, "seen" : true, "bookmarked": false, "expiry" : 1636758000 }
+
+  id:
+    type: "integer"
+    format: "int64"
+    description: "Unique movie id. Create as Java hash value of sender and url:<br>(java) int id = (sender + url).hashCode().abs()"
+    example: 26071963

@@ -1,0 +1,23 @@
+{
+  "name": "myMediathek",
+  "version": "0.9.0",
+  "scripts": {
+    "start": "run-script-os",
+    "start:default": "echo 'not supported platform'",
+    "start:win32": "scripts\\start.bat",
+    "start:linux": "scripts/start.sh"
+  },
+  "devDependencies": {
+    "eslint": "^8.28.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.5.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "grunt": "^1.5.3",
+    "grunt-contrib-clean": "^2.0.1",
+    "grunt-contrib-compress": "^2.0.0",
+    "grunt-eslint": "^24.0.1",
+    "grunt-replace": "^2.0.2",
+    "run-script-os": "^1.1.6"
+  }
+}
