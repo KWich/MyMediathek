@@ -13,6 +13,17 @@ module.exports = function (grunt) {
       target: ['src/**/*.js']
     },
 
+    // https://stylelint.io/
+    stylelint: {
+      css: {
+        options: {
+            configFile: '.stylelintrc',
+            format: 'css'
+        },
+        src: [ 'src/**/*.css' ]
+      },
+    },
+
     // make a zipfile ref https://github.com/gruntjs/grunt-contrib-compress
     compress: {
       linux: {
@@ -159,8 +170,16 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-replace');
+  grunt.loadNpmTasks( 'grunt-stylelint' );
 
-  grunt.registerTask('default', ['clean:build', 'eslint', 'replace', 'compress', 'clean:release']);
+  grunt.registerTask('default',
+                      [ 'clean:build',
+                        'eslint',
+                        'stylelint',
+                        'replace',
+                        'compress',
+                        'clean:release']
+                     );
   grunt.registerTask('zip', ['clean:build', 'replace', 'compress:windows', 'clean:release']);
   grunt.registerTask('tar', ['clean:build', 'replace', 'compress:linux', 'clean:release']);
   grunt.registerTask('lint', ['eslint']);

@@ -1,4 +1,6 @@
-
+:root {
+  --box-shadow: 0 4px 10px 0 rgb(0 0 0 / 20%), 0 4px 10px 0 rgb(0 0 0 / 20%);
+}
 
 #Stats {
   margin-top: 5.5em;
@@ -10,13 +12,18 @@
   margin-bottom: 10px;
 }
 
-.rr1 > td ~ td {
-  text-align: right;
+article {
+  background-color: white;
 }
 
-.tcellright {  /* used in js */
-  text-align: right;
-  width: 5em;
+article > div > span {
+  padding: 10px 20px;
+}
+
+button {
+  background-color: #2196f3;
+  color: #fff;
+  padding: 2px 6px;
 }
 
 th {
@@ -40,34 +47,54 @@ section {
 article > div > img {
   height: 0.8em;
   padding: 4px;
-  align-self:center;
+  align-self: center;
   margin-left: auto;
   margin-right: 1em;
+}
+
+footer > button {
+  padding: 8px 16px;
+}
+
+section > article {
+  padding: 8px;
+}
+
+section > article > div {
+  background-color: lightblue;
+  padding: 2px;
 }
 
 .leer {
   font-size: 0.5em;
 }
 
+.rr1 > td ~ td {
+  text-align: right;
+}
+
 #msstat > tr > td {
   width: 18em;
+}
+
+.tcellright {  /* used in js */
+  text-align: right;
+  width: 5em;
 }
 
 .nocat {
   color: #f11;
   font-style: italic;
-  /*font-size: 1.2em;*/
 }
 
 .top-right {
-  /*float: right;*/
   margin-left: auto;
   margin-right: 1em;
   align-self: center;
 }
 
 .flexcard {
-  display:flex;
+  display: flex;
 }
 
 .flexcard button img {
@@ -76,18 +103,18 @@ article > div > img {
 }
 
 .playercard {
-  display:flex;
-  box-shadow: 0 4px 10px 0 rgba(0,0,0,0.2),0 4px 20px 0 rgba(0,0,0,0.19);
   border-radius: 4px;
+  box-shadow: var(--box-shadow);
+  display: flex;
   margin: 8px 4px;
   padding: 8px;
 }
 
 .playercard > div {
+  align-self: center;
   margin: 8px 40px 8px 10px;
   min-width: 6em;
   width: 30%;
-  align-self: center;
 }
 
 .card {
@@ -95,34 +122,50 @@ article > div > img {
 }
 
 .card > div {
-  margin: 8px 0px 8px 10px;
+  margin: 8px 0 8px 10px;
   min-width: 6em;
-  width: 70%
+  width: 70%;
 }
 
 .listbtn {
-  border-radius: 8px;
-  align-self: center;
   align-content: end;
-  padding: 2px 6px;
-}
-
-button {
-  background-color: #2196F3;
-  color: #fff;
+  align-self: center;
+  border-radius: 8px;
   padding: 2px 6px;
 }
 
 .imgbtn {
-  width: 4em;
   border-radius: 2em;
   height: 4em;
+  width: 4em;
 }
 
 .cardBtn {
   width: 3em;
   border-radius: 50%;
   background-color: unset;
+}
+
+.field-wrap {
+  width: 100%;
+  display: flex;
+}
+
+.field-wrap input {
+  width: 100%;
+  flex-grow: 1;
+}
+
+.field-wrap label {
+  margin-top: 1.25em;
+}
+
+.filterinput input {
+  border-style: solid;
+  border-color: grey;
+  border-width: 1px;
+  padding: 4px;
+  width: 80%;
 }
 
 .dialog-content {
@@ -135,25 +178,24 @@ button {
 }
 
 .dialog-content > .container label {
-  /*min-width: 35%;*/
   width: 10em;
   display: inline-block;
 }
 
 .dialog-content > .container label + label {
+  border-radius: 2px;
+  border-style: dashed;
+  border-width: thin;
+  font-size: 1.2em;
   margin: 8px;
   padding: 4px 8px;
-  font-size: 1.2em;
-  border-width: thin;
-  border-style: dashed;
-  border-radius: 2px;
 }
 
 .dialog-content > .container > select {
-  margin: 8px;
   background-color: white;
+  border-color: #000;
   border-style: solid;
-  border-color: rgb(0, 0, 0);
+  margin: 8px;
 }
 
 .dialog-content > .container > select,
@@ -171,41 +213,25 @@ button {
   margin: 4px;
 }
 
-.field-wrap {
-  width: 100%;
-  /*margin-bottom: 10px;*/
-  display: flex;
-}
-
-.field-wrap input {
-  width: 100%;
-  flex-grow: 1;
-}
-
-.field-wrap label {
-  margin-top: 1.25em;
-}
-
 .dfooter {
   display: flex;
 }
 
 footer.color_fl {
-  border-radius: 0px 0px 8px 8px;
+  border-radius: 0 0 8px 8px;
 }
 
 h3.container {
   padding: 8px;
-  border-radius: 8px 8px 0px 0px;
-  margin-top: 0px;
+  border-radius: 8px 8px 0 0;
+  margin-top: 0;
 }
 
 #mPort {
-  width: 4em;
   margin-left: 5px;
   text-align: center;
+  width: 4em;
 }
-
 
 #mNewPlayerButton,
 .cardrightSave,
@@ -240,34 +266,6 @@ h3.container {
   padding: 8px 16px;
 }
 
-#mPort {
-  width: 4em;
-  margin-left: 5px;
-  text-align: center;
-}
-
-footer > button {
-  padding: 8px 16px;
-}
-
-section > article {
-  padding: 8px;
-}
-
-section > article > div {
-  padding: 2px;
-  background-color: lightblue;
-}
-
-article {
-  background-color: white;
-}
-
-article > div > span {
-  padding: 10px 20px;
-  /*font-size: 1.2em;*/
-}
-
 .defaultplayer {
   color: blue;
   font-weight: bold;
@@ -277,38 +275,31 @@ article > div > span {
   font-size: 0.8em;
 }
 
-.filterinput input {
-  border-style: solid;
-  border-color: grey;
-  border-width: 1px;
-  padding: 4px;
-  width: 80%;
-}
-
 #list {
-  text-align: right;
   display: inline-block;
+  padding: 10px 20px;
+  text-align: right;
   width: inherit;
-  padding: 10px 20px
 }
 
 #list > div {
   float: left;
-  margin-top: 1em;
   font-size: 1.2em;
+  margin-top: 1em;
 }
 
 #list > button {
-  margin: 10px;
-  padding: 10px 5px;
   background-color: #cff;
   display: inline-block;
+  margin: 10px;
+  padding: 10px 5px;
 }
 
-@media (min-width:701px){
+@media (min-width: 701px) {
   article {
     width: 98.8%;
   }
+
   article > div {
     min-height: 1em;
   }

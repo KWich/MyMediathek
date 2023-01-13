@@ -5,9 +5,7 @@
 
 Mit MyMediathek können beliebige Beiträge aus den öffentlich-rechtlichen Mediatheken, wie ARD, ZDF, Arte, 3SAT, gesucht und in einer Merkliste abgespeichert werden, und sie dann später z.B. auf dem Fernseher wieder abzuspielen. 
 
-Die Anwendung stellt einen lokalen Webserver bereit, auf den von allen Geräten aus dem Heimnetzwerk mit dem bevorzugten Webbrowser zugegriffen werden kann. Damit stehen alle Informationen allen Benutzern zentral zur Verfügung, ohne das diese auf ihren Geräten eine spezielle Software installieren, oder Daten synchronisieren müssen.
-
-Die Inhalte der Mediatheken werden im Browser in einer übersichtlichen Filmliste dargestellt, die aus der Datenbank des [MediathekView](https://mediathekview.de/) Projektes erzeugt und mit zusätzlichen Informationen aus den Mediatheken, wie Vorschaubild und Verfügbarkeit ergänzt wird:
+Die Anwendung stellt einen lokalen Webserver bereit, auf den von allen Geräten aus dem Heimnetzwerk mit dem bevorzugten Webbrowser zugegriffen werden kann.  Die Inhalte der Mediatheken werden im Webbrowser in einer übersichtlichen Filmliste dargestellt, die aus der Datenbank des [MediathekView](https://mediathekview.de/) Projektes erzeugt und mit zusätzlichen Informationen aus den Mediatheken, wie Vorschaubild und Verfügbarkeit ergänzt wird:
 
 <p align="center">
   <img src="docs/images/Filmliste.png" alt="filmliste" width=50%/> 
@@ -33,11 +31,14 @@ Damit wird eine individuelle Mediathek nach eigenen Vorlieben erstellt, die im H
   <img src="docs/images/Merkliste.png" alt="merkliste" width=50%/> 
 </p>
 
-<br>
+Alle Informationen stehen allen Benutzern zentral zur Verfügung, ohne das diese auf ihren Geräten eine spezielle Software installieren, oder Daten synchronisieren müssen.
 
-Features:
+<br><br>
+
+### Features: ###
+
 - Benutzerfreundliches Frontend für öffentliche rechtliche Mediatheken, mit erweiterten Such- und Sortieroptionen
-- Anzeige von zusätzlichen Beitragsinformationen wie Vorschaubild und Verfügbarkeit.
+- Anzeige von zusätzlichen Filminformationen wie Vorschaubild und Verfügbarkeit.
 - Abspeichern von Beiträgen in einer lokalen Merkliste mit freiwählbaren Kategorien. 
 - Farbige Markierungen für gemerkte und gesehene Filme, sowie für bald ablaufende bzw. abgelaufene Filme.
 - (Firefox) Add-on um Filminformation auch direkt aus den Webseiten der ARD, ZDF und ARTE Mediathek in die Merkliste zu übernehmen.

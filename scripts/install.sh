@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# MyMediathek Vx.x
+#
 # (c) 2022-2023 Klaus Wich
 #
-# Install MyMediathek on Linux systems
+# Install on Linux systems
 #
 # This file is copyright under the latest version of the EUPL.
 # Please see LICENSE file for your rights under this license
@@ -10,17 +10,34 @@
 # Usage:  install.sh [--force]
 #
 # --force: Ask to continue in case of errors
+#
 
 readonly defaultPort=8081
+readonly defaultpath="/opt/mymediathek"
+readonly defaultscript="mymediathek"
 
-checkInstallPackage() {
-  printf " * prüfe ob Paket $1 installiert ist: "
-  if [ $(dpkg-query -W -f='${Status}' "$1" 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+clear
+printf "\n=== Installation von %s ===\n\n" "MyMediathek Vx.x)"
+
+checkAptPackage() {
+  printf " * Prüfe ob Paket %s installiert ist: ", "$1"
+  if [ "$(dpkg-query -W -f='${Status}' "$1" 2>/dev/null | grep -c "ok installed")" -eq 0 ]; then
     echo "nicht vorhanden => Installation von $1"
     sudo apt install "$1";
   else
     echo "Ok"
   fi
+}
+
+checkZypperPackage() {
+  printf " * Prüfe ob Paket %s installiert ist: ", "$1"
+  if [ "$(rpm -q "$1" 2>/dev/null | grep -c "$1-")" -eq 0 ]; then
+    echo "nicht vorhanden => Installation von $1"
+    sudo zypper install "$1";
+  else
+    echo "Ok"
+  fi
+
 }
 
 checkIfPortIsAvailable() {
@@ -47,20 +64,9 @@ weiter() {
 }
 
 # === MAIN ===
-whichapt=`which apt`
-if [ "$whichapt" == "" ]; then
- doPkgInstall=0
-else
- doPkgInstall=1
-fi
-
-
 currentDir=$(pwd)
 
 #Preparation:
-clear
-printf "\n=== Installation von MyMediathek Vx.x ===\n\n"
-
 if [[ "$1" == "--force" ]]; then
   force=1
 else
@@ -71,12 +77,12 @@ fi
 myUserName=${SUDO_USER:-$USER}
 myUserGroups=$(groups)
 if [ "$EUID" -ne 0 ]; then
-  echo  Schritt: Benutzerrechte prüfen
+  printf " Schritt: Benutzerrechte prüfen\n\n"
   echo -n " * prüfe 'sudo' Rechte für Benutzer ${myUserName} ... "
   if [[ ${myUserGroups} =~ "sudo" ]]; then
     echo " Ok"
   else
-    printf "\n\n   Es konnte nicht festgestellt werden ob Benutzer '${myUserName}' 'sudo' Rechte hat.\n   Ohne sie kann die Installation kann nicht ausgeführt werden\n\n"
+    printf "\n\n   Es konnte nicht festgestellt werden ob Benutzer '%s' 'sudo' Rechte hat.\n   Ohne sie kann die Installation kann nicht ausgeführt werden\n\n" "${myUserName}"
     while true; do
       read -n1 -r -p "   Soll die Installation trotzdem versucht werden (j/n) ? " yn
       case $yn in
@@ -85,15 +91,16 @@ if [ "$EUID" -ne 0 ]; then
           * ) echo "   Bitte ja oder nein angeben.";;
       esac
     done
+    echo
   fi
 fi
 
 
-printf "\n\nSchritt: Einstellungen erfragen\n\n"
+printf "\n Schritt: Einstellungen erfragen\n\n"
 
-read -r -p " => Installationsverzeichnis eingeben [/opt/mymediathek]: " myInstallPath
+read -r -p " => Installationsverzeichnis eingeben [$defaultpath]: " myInstallPath
 if [ -z "$myInstallPath" ]; then
-  myInstallPath="/opt/mymediathek"
+  myInstallPath="$defaultpath"
 fi
 
 # - prompt port:
@@ -103,18 +110,24 @@ if [ -z "$myServicePort" ]; then
 fi
 
 # - prompt for user
-read -r -p " => Benutzername unter dem die Anwendung laufen soll angeben [mmservice]: " myServiceUser
+if [ -x "$(command -v apt)" ]; then
+  defaultServiceUser="mmservice"
+else
+  defaultServiceUser="${myUserName}"
+fi
+
+read -r -p " => Benutzername unter dem die Anwendung laufen soll angeben [${defaultServiceUser}]: " myServiceUser
 if [ -z "$myServiceUser" ]; then
-  myServiceUser="mmservice"
+  myServiceUser="${defaultServiceUser}"
 fi
 
 echo
 echo " * Installationsverzeichnis : $myInstallPath"
 echo " * Server Portnummer        : $myServicePort"
 echo " * Benutzername             : $myServiceUser"
-
+echo
 while true; do
-  read -n1 -r -p "   Sollen diese Werte benutzt werden (j/n) ? " yn
+  read -n1 -r -p " => Sollen diese Werte benutzt werden (j/n) ? " yn
   case $yn in
       [YyJj]* ) break;;
       [Nn]* ) echo; echo; exit;;
@@ -122,9 +135,7 @@ while true; do
   esac
 done
 
-echo
-echo
-echo  Schritt: Voraussetzungen überprüfen
+printf "\n\n Schritt: Voraussetzungen überprüfen\n\n"
 
 checkIfPortIsAvailable "${myServicePort}"
 if [[ $? == 1 ]]; then
@@ -134,12 +145,19 @@ else
   exit 1
 fi
 
-if [ ${doPkgInstall} == 1 ]; then
-  checkInstallPackage python3
-  checkInstallPackage python3-pip
-  checkInstallPackage python3-venv
+if [ -x "$(command -v apt)" ]; then
+  echo " * Paket Manager 'apt' gefunden"
+  checkAptPackage python3
+  checkAptPackage python3-pip
+  checkAptPackage python3-venv
+elif [ -x "$(command -v zypper)" ]; then
+  echo " * Paket Manager 'zypper' gefunden"
+  checkZypperPackage python3
+  checkZypperPackage python3-pip
+  checkZypperPackage python3-virtualenv
+  checkZypperPackage python3-devel
 else
-  echo " * Kein 'apt' Paket Manager => Pakete werden nicht automatisch installiert."
+  echo " * Keinen bekannten Paket Manager (apt oder zypper) gefunden => fehlende Pakete werden nicht automatisch installiert."
 fi
 
 # check if python is installed:
@@ -193,15 +211,12 @@ read -ra garr <<< "$bmgroups"
 myServiceGroup=${garr[0]}
 echo " * Benutzer ${myServiceUser} gehört zu der Gruppe ${myServiceGroup}."
 
-echo
-echo  Schritt: Python Umgebung anlegen
 
-cd "$myInstallPath" 
-if [[ $(pwd) != "$myInstallPath" ]]; then
-  echo " !! Kann Verzeichnis ${myInstallPath} nicht als Arbeitsverzeichnis setzen => Installation wird abgebrochen"
-  cd "$currentDir" || exit
-  exit 2
-fi
+printf "\n Schritt: Python Umgebung anlegen\n"
+
+cd "$myInstallPath" || { echo " !! Kann Verzeichnis ${myInstallPath} nicht als Arbeitsverzeichnis setzen => Installation wird abgebrochen"; exit 2; }
+
+echo " * Aktuelles Verzeichnis ist Installationsverzeichnis $(pwd): Ok"
 echo " * Aktuelles Verzeichnis ist Installationsverzeichnis $(pwd): Ok"
 
 if [ -f "$myInstallPath/env/pyvenv.cfg" ]; then
@@ -213,21 +228,21 @@ else
     echo " Fertig"
   else
     printf "\n Anlegen der Umgebung ist fehlgeschlagen!! => Installation wird abgebrochen, ist Python 'venv' installiert?
-          \nFehlerdetails:\n>>>>>>>>>>>>>>\n${ERROR}\n<<<<<<<<<<<<\n\n"
+          \nFehlerdetails:\n>>>>>>>>>>>>>>\n%s\n<<<<<<<<<<<<\n\n", "${ERROR}"
     exit 2
   fi
 fi
 
 echo " * Python Umgebung wird aktiviert : Ok"
-source "$myInstallPath"/env/bin/activate
+source "${myInstallPath}"/env/bin/activate
 echo -n " * Notwendige Python Komponenten werden installiert ..."
-ERROR=$(pip3 install -q -r "$currentDir"/scripts/python.requirements 2>&1 > /dev/null)
+ERROR=$(pip3 install -q --disable-pip-version-check -r "$currentDir"/scripts/python.requirements 2>&1 > /dev/null)
 if [[ -z "${ERROR}" ]]; then
   echo " Fertig"
 else
   if [[ ${force} == 1 ]]; then
     printf "\n Fehler bei der Installation der Pythonkomponenten:
-            \nFehlerdetails:\n>>>>>>>>>>>>>>\n${ERROR}\n<<<<<<<<<<<<\n\n"
+            \nFehlerdetails:\n>>>>>>>>>>>>>>\n%s\n<<<<<<<<<<<<\n\n", "${ERROR}"
     while true; do
       read -n1 -r -p "   Soll die Installation trotzdem fortgesetzt werden (j/n) ? " yn
       case $yn in
@@ -238,7 +253,7 @@ else
     done
   else
     printf "\n Installation fehlgeschlagen!! => Installation wird abgebrochen, sind die Voraussetzungen vorhanden ?
-            \nFehlerdetails:\n>>>>>>>>>>>>>>\n${ERROR}\n<<<<<<<<<<<<\n\n"
+            \nFehlerdetails:\n>>>>>>>>>>>>>>\n%s\n<<<<<<<<<<<<\n\n", "${ERROR}"
     exit 3
   fi
 fi
@@ -247,8 +262,7 @@ echo " * Python Umgebung wird deaktiviert: Ok"
 deactivate
 
 
-echo
-echo  Schritt: Server installieren
+printf "\n Schritt: Server installieren\n"
 
 echo -n " * kopiere Serverdateinen nach $myInstallPath ..."
 sudo cp -r "$currentDir"/server/. "$myInstallPath"/server
@@ -292,12 +306,15 @@ sudo chown -R "${myServiceUser}":"${myServiceGroup}" "$myInstallPath"
 echo " Fertig"
 
 echo -n " * Symbolischen Link zum Kontroll Script anlegen ..."
-sudo ln -sf  "${myInstallPath}"/scripts/mymediathek.sh /usr/bin/mymediathek
+sudo ln -sf  "${myInstallPath}"/scripts/$defaultscript.sh /usr/bin/$defaultscript
 echo " Fertig"
 
 # end:
 echo
+
+echo " * Start des Servers im Vordergrund mit: $defaultscript run"
+echo " * Anzeige aller Kommando Optionen mit:  $defaultscript"
+echo
 echo .. INSTALLATION BEENDET
-echo 
-echo Start des Servers mit 'mymediathek run' oder nur 'mymediathek' für alle Optionen
-echo 
+echo
+

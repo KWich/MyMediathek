@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MyMediathek</title>
-  <link rel="icon" type="image/png" href="static/images/favicon.png" />
+  <link rel="icon" type="image/png" href="static/images/favicon.png">
   <link rel="stylesheet" href="static/css/kw.css">
 </head>
 <body>
   <!-- Header -->
   <header id="header">
     <div class="kflexbar">
-      <h1 id="toptitle"></h1>
+      <h1 id="toptitle">MyMediathek</h1>
       <div id="topplayer" class="topplay" data-id="0">Webbrowser</div>
       <div id="topmenu" class="dropdown topbtn-right">
-        <button><img src="static/images/gear.svg"/></button>
+        <button><img src="static/images/gear.svg" alt="gear"></button>
         <div class="dropdown-content drop-top">
           <optgroup id="playerlist" label="Film Wiedergabe mit:">
             <option id="o_play" data-id="0">Webbrowser</option>
@@ -56,7 +56,7 @@
           <a href="#"></a>
           <button id="searchBtn">Suche:</button>
           <div class="popoverContent">
-            <p class="popoverMessage"><span class="popoverTitle">Suchoptionen:</span><br>!<sender,sender> ! : alle Sender<br>#Thema<br>+Titel<br>*Beschreibung<br>&lt;x (in minuten)<br>&gt;x (in minuten)<br>++ zukünftige</p>
+            <p class="popoverMessage"><span class="popoverTitle">Suchoptionen:</span><br>![sender][,sender] ! : alle Sender<br>#Thema<br>+Titel<br>*Beschreibung<br>&lt;x (in minuten)<br>&gt;x (in minuten)<br>++ zukünftige</p>
           </div>
         </div>
       </div>
@@ -139,8 +139,8 @@
       <h3 class="container color_ml">Ablaufdatum festlegen:</h3>
       <div id="msgpopupexpdlg" class="popinline"></div>
       <div class="kbar">
-        <input id="InputAblaufdatum" placeholder="Ablaufdatum" class="input-large kwmrg" type="date">
-        <button id="ReqExpiryDate" class="borderBtn btn-right kwmrg"> hole Datum von Webseite ... <img src="static/images/download-cloud.svg" height="24" class=""/></button>
+        <input id="InputAblaufdatum" class="input-large kwmrg" type="date">
+        <button id="ReqExpiryDate" class="borderBtn btn-right kwmrg"> hole Datum von Webseite ... <img src="static/images/download-cloud.svg" alt="cloud" height="24" class=""></button>
       </div>
       <footer class="color_ml dfooter">
         <button onclick="document.getElementById('dlgSetExpiry').style.display='none'" type="button" class="cancelBtn round-large kwmrg">Abbruch</button>
@@ -167,10 +167,8 @@
   <div id="msgpopup" class="popup"></div>
 
   <!-- wait -->
-  <img id="wait" src="static/images/wait.svg" style="display: none;"/>
+  <img id="wait" src="static/images/wait.svg" alt="wait" style="display: none;">
 
+  <script type="module" src="static/js/main.js"></script>
 </body>
-
-<script type="module" src="static/js/main.js"></script>
-
 </html>

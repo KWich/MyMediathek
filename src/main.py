@@ -5,12 +5,29 @@ Main module of MyMediathek server
 import os
 import requests
 import flask
+import socket
 import sys
 import re
+import click
 
 from flask import render_template
 from api import connex_app, db, dbname, cfgConfig
 from api.models import *
+
+
+def get_ip():
+  s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+  s.settimeout(0)
+  try:
+      # doesn't even have to be reachable
+      s.connect(('10.254.254.254', 1))
+      IP = s.getsockname()[0]
+  except Exception:
+      IP = '127.0.0.1'
+  finally:
+      s.close()
+  return IP
+
 
 # perform necessary init functions
 def init():
@@ -84,7 +101,15 @@ if __name__ == '__main__':
   # Set Server mode:
   # BM_SERVER_MODE = 1 : listens on all external interfaces
   #                  0 or missing means use loopback interface
-  bmServerMode = '0.0.0.0' if cfgConfig.getboolean('general', 'servermode', fallback = True) else '127.0.0.1'
+  if cfgConfig.getboolean('general', 'servermode', fallback = True):
+    bmServerMode = '0.0.0.0'
+    serverip = get_ip();
+  else:
+    bmServerMode = '127.0.0.1'
+    serverip = bmServerMode;
   bmServerPort = cfgConfig.get('general', 'serverport', fallback = 8081)
-  print (" * Server port is " + str(bmServerPort))
+  #import pdb; pdb.set_trace()
+  cli = sys.modules['flask.cli']
+  cli.show_server_banner = lambda *x: click.echo("\n------------------------------------------------------\nDie Webseite kann jetzt im Browser unter der Adresse\n    http://" + serverip + ":" + str(bmServerPort) +" geöffnet werden.\n------------------------------------------------------\n\n")
+
   connex_app.run(port=bmServerPort, host=bmServerMode, debug=cfgConfig.getboolean("develop","enable_debug_mode", fallback=None))

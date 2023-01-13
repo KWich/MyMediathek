@@ -22,92 +22,223 @@ In einem Linux System kann MyMediathek entweder als Anwendung oder als 'systemd'
 
 3. Installation mit '**./install.sh**' starten und den Anweisungen folgen. 
 
+---
+<details>
+<summary>Beispiel: Installation auf Debian</Summary>
+<p>
+
+>```
+>=== Installation von MyMediathek 0.9.1 (13/01/2023)) ===
+>
+> Schritt: Benutzerrechte prüfen
+>
+> * prüfe 'sudo' Rechte für Benutzer klaus ...  Ok
+>
+> Schritt: Einstellungen erfragen
+>
+> => Installationsverzeichnis eingeben [/opt/mymediathek]:
+> => Server Portnummer angeben [8081]:
+> => Benutzername unter dem die Anwendung laufen soll angeben [mmservice]:
+>
+> * Installationsverzeichnis : /opt/mymediathek
+> * Server Portnummer        : 8081
+> * Benutzername             : mmservice
+>
+> => Sollen diese Werte benutzt werden (j/n) ? j
+>
+> Schritt: Voraussetzungen überprüfen
+>
+> * Server Port 8081 ist verfügbar : Ok
+> * Paket Manager 'apt' gefunden
+> * Prüfe ob Paket python3 installiert ist: ,Ok
+> * Prüfe ob Paket python3-pip installiert ist: ,Ok
+> * Prüfe ob Paket python3-venv installiert ist: ,Ok
+> * Prüfe ob Python3 vorhanden ist ...  Ok
+> * Prüfe ob 'pip3' vorhanden ist ...  Ok
+>[sudo] password for klaus:
+> * Installationsverzeichnis /opt/mymediathek wurde angelegt: Ok
+> * Installationsverzeichnis /opt/mymediathek wurde schreibbar gemacht
+> * Benutzer mmservice ist angelegt: Ok
+> * Benutzer mmservice gehört zu der Gruppe mmservice.
+>
+> Schritt: Python Umgebung anlegen
+> * Aktuelles Verzeichnis ist Installationsverzeichnis /opt/mymediathek: Ok
+> * Aktuelles Verzeichnis ist Installationsverzeichnis /opt/mymediathek: Ok
+> * Python Umgebung wird angelegt ... Fertig
+> * Python Umgebung wird aktiviert : Ok
+> * Notwendige Python Komponenten werden installiert ... Fertig
+> * Python Umgebung wird deaktiviert: Ok
+>
+> Schritt: Server installieren
+> * kopiere Serverdateinen nach /opt/mymediathek ... Fertig
+> * Dateien dem Benutzer mmservice und der Gruppe mmservice zuweisen ... Fertig
+> * Symbolischen Link zum Kontroll Script anlegen ... Fertig
+>
+> * Start des Servers im Vordergrund mit: mymediathek run
+> * Anzeige aller Kommando Optionen mit:  mymediathek
+>
+>.. INSTALLATION BEENDET
+>```
+
+</p>
+</details>
+
+---
+
+<br>
 Nach der Installation steht der Befehl '**mymediathek**' zur Verfügung mit dem das Programm kontrolliert wird:
-- '**mymediathek**' zeigt alle verfügbaren Optionen an.
+<br><br>
+
 - '**mymediathek run**' führt das Programm aus
+
+- '**mymediathek**' zeigt alle verfügbaren Optionen an.
+
 - '**mymediathek installService**' installiert und startet MyMediathek als Systemservice.   
 
-Hinweise: 
-- Das Installationsskript verwendet **'sudo'**, der Benutzer muss über die entsprechenden Rechte verfügen.
-- Das Installationsskript ist für Debian basierte Systeme mit 'apt' als Paket Manager. Falls ein anderer Paket Manager benutzt wird, müssen die notwendigen Python Pakete (python3, pip3, python-venv und evtl. python-devel) zuvor von Hand installiert werden. (Es ist nicht garantiert, dass das Installationsskript auf nicht Debian basierten Systemen reibungslos durchläuft, evtl. muß händisch nachkonfiguriert werden). Ansonsten die manuelle Installation wie unter [Alternative Linux Installation](#altLinux) beschreiben wurde
+<br>
 
+### Hinweise: ###
+- Das Installationsskript verwendet **'sudo'**, der Benutzer muss über die entsprechenden Rechte verfügen.
+- Das Installationsskript unterstützt 'apt' bzw. 'zypper' als Paketmanager (Debian oder openSuse basierte Distributionen. Falls ein anderer Paket Manager benutzt wird, müssen die notwendigen Python Pakete (python3, pip3, python-venv und python-dev bzw. python-devel) zuvor von Hand installiert werden. (Es ist nicht garantiert, dass das Installationsskript auf diesen Systemen reibungslos durchläuft, evtl. muß händisch nachkonfiguriert werden). Ansonsten die manuelle Installation wie unter [Alternative Linux Installation](#altLinux) beschreiben wurde verwenden.
+- Falls eine Firewall verwendet wird, muß in dieser der verwendete Port geöffnet werden, damit der Server von außerhalb erreichbar ist (z.B openSuse).
+- Bei manchen Distributionen (z.B. openSuse) kann es Schwirigkeiten geben, wenn ein eigener Benutzername für den  Server verwendet wird, da ein passwortloser Systemaccount nicht erstellt werden kann, bzw. beim Aufruf trotzdem ein Passwort anfordert. Hier für die Installation einen bestehenden User verwenden. Nachträglich kann der Benutzer mit folgendem Kommando noch geändert werden: 
+>>  `sudo chown -R ich:users /opt/mymediathek`
+
+
+ 
 <br>
 
 ## Windows Installation ##
 Damit MyMediathek auf Windows ausgeführt wird, muss 'python3' mit 'pip' installiert und im PATH verfügbar sein. Python für Windows ist entweder im Microsoft Store oder im Internet auf [python.org](https://www.python.org) verfügbar.
 
-Zur Installation:
+### Installieren: ###
 
-1. Das bereitgestellte Archiv **myMediathek-win.zip** in ein temporäres Verzeichnis kopieren. und in das gewünschte Zielverzeichnis extrahieren.
+1. Das bereitgestellte Archiv **myMediathek-win.zip** in ein temporäres Verzeichnis kopieren und in das gewünschte Zielverzeichnis extrahieren.
 
-2. Start- und Installationsskript '**start.bat**' starten. Das Script prüft ob die Vorrausetzungen gegeben sind und erstellt beim ersten Lauf die notwendige Python Umgebung. Wenn die Umgebung existiert wird der Server gestartet, und die Webseite im Browser aufgerufen werden.
+2. Start- und Installationsskript '**start.bat**' starten. Das Script prüft ob die Vorausetzungen gegeben sind und erstellt beim ersten Lauf die notwendige Python Umgebung. Wenn die Umgebung existiert wird der Server gestartet, und die Webseite kann im Browser aufgerufen werden:
+<br><br>
 
-Hinweise:
+---
+<details>
+<summary>Beispiel: Start Ausgabe</Summary>
+<p>
+
+>
+>```
+>Starte MyMediathek 0.9.1 (13/01/2023)
+>
+>- Python ist installiert
+>- PIP ist installiert
+>- Python Umgebung wird erstellt ...
+>   ...fertig
+>- Python Umgebung wird aktiviert
+>- Python Module werden installiert ...
+>   das dauert etwas!!
+>- Python Module sind installiert
+>- Server wird gestartet
+>
+>MyMediathek Server Version 0.9.1 (13/01/2023)
+> * Starte config ...
+>  NO Ini file provided, using defaults
+>
+> Player:
+> * keine Player konfiguriert
+>
+> Einstellungen:
+> * INI Datei         : None
+> * Database Datei    : D:\MyMediathek\data\bookmarks.db
+> * Bassisverzeichnis : D:\MyMediathek\src
+> * Debugmodus        : inaktiv
+>
+>------------------------------------------------------
+>Die Webseite kann jetzt im Browser unter der Adresse
+>   http://192.168.10.26:8081 geöffnet werden.
+>------------------------------------------------------
+>```
+
+</p>
+</details>
+
+---
+<br>
+
+### Hinweise: ###
 - Bei der Erstinstallation wird immer der Port 8081 für den Webserver gesetzt. Er kann anschließend über die Server.ini Datei geändert werden (siehe "Erweiterte Installation und Konfiguration").
+- Damit der Server von anderen Rechnern erreichbar ist muß eventuell der verwendete Port (Standard:8081) in der Windows Firewall freigegeben werden.
+- Für eine ausführliche Ausgabe, z.B. zur Fehlersuche kann das Startskript mit der Option '-v' gestartet werden:
+
+>```
+>   start.bat -v
+>```
 
 <br>
 
 ## <a id="altLinux"></a>Alternative Linux Installation ##
 Auf Systemen auf denen das '**./install.sh**' nicht funktioniert, kann mit folgendem Vorgehen der Server "von Hand" installiert werden:
 
+### Voraussetzungen schaffen: ###
+  Pakete 'python3', 'pip3', 'python3-dev' bzw. 'python3-develop' und 'python3-venv' installieren.
+
+### Installation Server: ###
+
 - Anlegen des Zielverzeichnisses z.B /opt/mymediathek mit
-  >sudo mkdir/opt/mymediathek
+  >```sudo mkdir/opt/mymediathek```
 
 - Verzeichnis für den aktuellen Benutzer schreibbar machen
-  >sudo chmod a+w /opt/mymediathek
+  >`sudo chmod a+w /opt/mymediathek`
 
 - Archiv in das Verzeichnis entpacken
-  >tar -xf myMediathek-0.9.3.tgz -C /opt/mediathek/
+  >`tar -xf myMediathek-0.9.3.tgz -C /opt/mediathek/`
 
 - In das Verzeichnis wechseln
-  > cd /opt/mymediathek
+  > `cd /opt/mymediathek`
 
-- Überprüfen ob python3 und pip3 installiert sind:
-  > python3 --version
-  
-  > pip3 --version
+- Optional überprüfen ob python3 und pip3 installiert sind:
+  > `python3 --version`
+  >
+  > `pip3 --version`
 
   Falls keine Versionen angezeigt werden, entsprechende Pakete installieren. 
 
 - Überprüfen ob das Python Virtual Environment installiert ist und falls notwendig installieren: 
-  > sudo apt-get install python3-venv  
+  > `sudo apt install python3-venv ` 
   (Debian Befehl gezeigt, für andere Distributionen entsprechend anpassen)
   
 - Python Umgebung anlegen (erzeugt den Pfad /opt/mymediathek/env):
-  > python3 -m venv env
+  > `python3 -m venv env`
 
 - Python Umgebung aktiveren:
-  > source env/bin/activate
+  > `source env/bin/activate`
 
 - notwendige Python Komponenten installieren 
-  >  pip3 install -r scripts/python.requirements
+  >  `pip3 install -r scripts/python.requirements`
   
   Hinweis: Falls hier Fehler auftreten muß eventuell noch das Paket 'python-dev' oder 'python-develop' nachinstalliert werden.
 
 - Python Umgebung verlassen
-  > deactivate
+  > `deactivate`
 
 - Start Skript in das Basis Verzeichnis kopieren:
-  > cp scripts/start.sh .
+  > `cp scripts/start.sh .`
 
 - Start Skript ausführbar machen:
-  >chmod +x start.sh
+  > `chmod +x start.sh`
 
 - Der Server kann jetzt gestartet werden mit:
-  >start.sh
+  > `start.sh`
 
 <br>
 
-### System Service anlegen ###
+### System Service anlegen (Systemd service): ###
 
 - In das Skriptverzeichnis wechseln
-  >cd /opt/mymediathek/scripts
+  > `cd /opt/mymediathek/scripts`
 
 - Skriptvorlage kopieren
-  >cp mymediathek.service-template mymediathek.service
+  >`cp mymediathek.service-template mymediathek.service`
 
-- Service Skript im Editor öffnen
-  >z.B. nano mymediathek.service
+- Service Skript im Editor (hier 'nano' öffnen
+  >`nano mymediathek.service`
 
   Im Service Skript jetzt die Werte für Verzeichnis, Benutzer, Benutzergruppe entsprechend den gewählten Einstellungen ändern, z.B. auf:
   ```
@@ -128,21 +259,21 @@ Auf Systemen auf denen das '**./install.sh**' nicht funktioniert, kann mit folge
   ```
 
 - Service Skript ins Systemverzeichnis verlinken (kann auch dahin kopiert werden)
-  >sudo ln -s /opt/bookmarkserver/scripts/mymediathek.service /etc/systemd/system/mymediathek.service
+  > `sudo ln -s /opt/bookmarkserver/scripts/mymediathek.service /etc/systemd/system/mymediathek.service`
 
 - Service defintionen neu laden (optional):
-  > sudo systemctl daemon-reload
+  > `sudo systemctl daemon-reload`
 
 - Service Starten mit:
-  > sudo systemctl start mymediathek.service
+  > `sudo systemctl start mymediathek.service`
 
 - Service Aktivieren für Neustart mit:
-  > sudo systemctl enable bookmark.service
+  > `sudo systemctl enable bookmark.service`
 
 <br>
 
 ### Kontrollskript ###
 
 Der Befehl '**mymediathek**' wird mit folgendem Kommando verfügbar gemacht:
->sudo ln -s /opt/bookmarkserver/scripts/mymediathek.sh /usr/bin/mymediathek
+> `sudo ln -s /opt/bookmarkserver/scripts/mymediathek.sh /usr/bin/mymediathek`
 

@@ -18,13 +18,12 @@ def printInfo():
   print ("\n Player:")
   print (cfgConfig.getPlayerInfo())
   print ("\n Einstellungen:")
-  print (" * INI file         : " + inifile)
-  print (" * Database file    : " + dbname)
-  print (" * Base path        : " + str(basedir))
-  print (" * StaticURL path   : " + str(os.path.join(basedir, app.static_url_path[1:])))
-  print (" * Debug            : " + str(cfgConfig.getboolean("develop","enable_debug_mode", fallback=False)))
-  print (" * Swagger UI       : " + str(cfgConfig.getboolean("develop","enable_swagger_ui", fallback=False)))
-  print (" * Explain Template : " + str(cfgConfig.getboolean("develop","explain_template_loading", fallback=False)))
+  print (" * INI Datei         : " + inifile)
+  print (" * Database Datei    : " + dbname)
+  print (" * Bassisverzeichnis : " + str(basedir))
+  print (" * Debugmodus        : " + ("aktiv" if cfgConfig.getboolean("develop","enable_debug_mode", fallback=False) else "inaktiv"))
+  if cfgConfig.getboolean("develop","enable_swagger_ui", fallback=False):
+    print (" * Swagger UI        : aktiv")
 
 
 
@@ -39,7 +38,11 @@ basedir = Path(os.path.abspath(os.path.dirname(__file__))).parent
 # read config file
 cfgConfig = myConfig()
 inifile = os.environ["BM_CONFIG_FILE"] if "BM_CONFIG_FILE" in os.environ else os.path.join(basedir.parent,"data","server.ini")
-cfgConfig.read(inifile)
+if os.path.exists(inifile):
+  cfgConfig.read(inifile)
+else:
+  print("  NO Ini file provided, using defaults")
+  inifile = "None"
 
 if "BM_DBFILE" in os.environ:
   dbname = os.environ["BM_DBFILE"]
