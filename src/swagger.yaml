@@ -82,7 +82,7 @@ paths:
                     description: "Number of days before expiry day, a movie gets a warning"
                 
             example: 
-              { "name": "MyMediathek Server", "version": "0.9.0", "defaultplayer": -1, "players": [], "config": {"searchChannelInclude": ["ARD", "ZDF"],  "searchTitleFilter" : [], "searchTopicFilter": [], "minMovieStateAge" : 183, "expiryWarningDays" : 5}}
+              { "name": "MyMediathek Server", "version": "0.9.2", "defaultplayer": -1, "players": [], "config": {"searchChannelInclude": ["ARD", "ZDF"],  "searchTitleFilter" : [], "searchTopicFilter": [], "minMovieStateAge" : 183, "expiryWarningDays" : 5}}
 
 
   /info/config:

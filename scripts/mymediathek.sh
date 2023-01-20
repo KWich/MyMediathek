@@ -30,7 +30,7 @@ update() {
       sudo chmod a+w "$myInstallPath";
       echo " * Installationsverzeichnis ${myInstallPath} wurde schreibbar gemacht"
     fi
-    echo " * Server Dateien nach $myInstallPath kopieren ..."
+    echo -n " * Server Dateien nach $myInstallPath kopieren ..."
     sudo cp -r "$installDir"/server/. "$myInstallPath"/server
     sudo cp -r "$installDir"/scripts/. "$myInstallPath"/scripts
     sudo chmod +x "$myInstallPath"/scripts/*.sh
@@ -38,6 +38,14 @@ update() {
     sudo mv "$myInstallPath"/scripts/start.sh "$myInstallPath"
     sudo chmod a+x "$myInstallPath"/start.sh
     echo " Fertig"
+
+    echo -n " * Zusätzliche Update Aufgaben durchführen: "
+    if [[ -f "${installDir}/scripts/updateadditionaltask.sh" ]]; then
+      source ${installDir}/scripts/updateadditionaltask.sh
+    else
+      echo " keine konfiguriert"
+    fi
+
 
     echo -n " * Dateien dem Benutzer ${myUserName} zuweisen ..."
     sudo chown -R "${myUser}":"${myUser}" "$myInstallPath"

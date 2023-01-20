@@ -110,6 +110,6 @@ if __name__ == '__main__':
   bmServerPort = cfgConfig.get('general', 'serverport', fallback = 8081)
   #import pdb; pdb.set_trace()
   cli = sys.modules['flask.cli']
-  cli.show_server_banner = lambda *x: click.echo("\n------------------------------------------------------\nDie Webseite kann jetzt im Browser unter der Adresse\n    http://" + serverip + ":" + str(bmServerPort) +" geöffnet werden.\n------------------------------------------------------\n\n")
+  cli.show_server_banner = lambda *x: click.echo("\n------------------------------------------------------\nDie Webseite kann jetzt im Browser unter der Adresse\n    http://" + serverip + ":" + str(bmServerPort) +" geoeffnet werden.\n------------------------------------------------------\n\n")
 
   connex_app.run(port=bmServerPort, host=bmServerMode, debug=cfgConfig.getboolean("develop","enable_debug_mode", fallback=None))

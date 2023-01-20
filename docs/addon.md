@@ -5,13 +5,18 @@
 
 Über die Verwaltungsseite kann eine signiertes Firefox Add-on "MyMediathek" heruntergeladen werden, welches es ermöglicht Beiträge von den ARD, ZDF, 3SAT und ARTE Mediatheken direkt in die Merkliste zu übernehmen oder mit dem Standardplayer abzuspielen.
 
+Hinweis:<br>
+Das Addon steht auf der Mozilla Addon Seite [https://addons.mozilla.org/de/firefox/](https://addons.mozilla.org/de/firefox/addon/mymediathek) unter dem Namen '[MyMediathek](https://addons.mozilla.org/de/firefox/addon/mymediathek)' zur Verfügung.
+
 <br>
 
 ## Installation in Firefox ##
 
-- Nach dem Herunterladen im Firefox Add-on Menü die Option "Add-on aus Datei installieren" auswählen um das Add-on zu Firefox hinzufügen:
+- Beim Laden des Addons mit Firefox kann dieses dirkt installiert werden. Ansonsten nach dem Herunterladen im Firefox Add-on Menü die Option "Add-on aus Datei installieren" auswählen um das Add-on zu Firefox hinzufügen:
 
   <img src="images/Firefox1.png" alt="drawing" width="500"/>
+
+Damit das Addon mit 'MyMediathek' zusammen arbeitet, muß in diesem noch die Adresse des Servers eingetragen werden. Dazu:
 
 - Die Verwaltung des Add-ons aufrufen - Im Punktemenü auf Verwalten gehen:
 
@@ -23,7 +28,7 @@
 
   Und mit "Speichern" sichern.
 
-  Anschliesend kann mit dem Button "Teste Serververbeindung" geprüft werden, ob der (richtige) Server erreicht wirden kann.
+  Anschliesend kann mit dem Button "Teste Serververbindung" geprüft werden, ob der (richtige) Server erreicht wirden kann.
 
 <br>
 

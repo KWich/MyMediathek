@@ -1,5 +1,5 @@
 /**
- * MyMediathek: Sender specific export export functions
+ * Sender specific export functions
  **/
 "use strict";
 
@@ -11,7 +11,7 @@ import {cfgCORS_ProxyServer} from "../config/config.js";
 * Checks if given url points to ARD and triggers retrieval of movie info
 * @return {boolean} True if ARD movie URL, False if other or error occurred
 */
-export function checkAndQueryARDMovieInfo(url, successFunc, errorFunc = null) {
+export function checkAndQueryARDMovieInfo(url, successFunc, errorFunc) {
   let rc = false;
   if (url && url.indexOf("ardmediathek") > -1) {
     // get ARD id
@@ -30,7 +30,7 @@ export function checkAndQueryARDMovieInfo(url, successFunc, errorFunc = null) {
 * Checks if given url points to ARTE and triggers retrieval of movie info
 * @return {boolean} True if ARTE movie URL, False if other or error in url occurred
 */
-export function checkAndQueryARTEMovieInfo(url, successFunc, errorFunc = null) {
+export function checkAndQueryARTEMovieInfo(url, successFunc, errorFunc) {
   let rc = false;
   if (url && url.indexOf("www.arte.tv") > -1) {
     // get ARTE id
@@ -40,9 +40,11 @@ export function checkAndQueryARTEMovieInfo(url, successFunc, errorFunc = null) {
       idx = surl.indexOf("/");
       if (idx > -1) {
         surl = surl.substring(0, idx);
-        let addheader = {name:"X-Requested-With", content:"BookmarkServer"};
-        utilSendHttpRequest("GET", cfgCORS_ProxyServer + "https://api.arte.tv/api/player/v2/config/de/" + surl + "?platform=ARTE_NEXT", null, false, successFunc, errorFunc, addheader) ;
-        rc = true;
+        if (surl.length > 5 && surl.indexOf("fernsehfilme") == -1) {
+          let addheader = {name:"X-Requested-With", content:"MyMediathek"};
+          utilSendHttpRequest("GET", cfgCORS_ProxyServer + "https://api.arte.tv/api/player/v2/config/de/" + surl + "?platform=ARTE_NEXT", null, false, successFunc, errorFunc, addheader) ;
+          rc = true;
+        }
       }
     }
   }
@@ -54,7 +56,7 @@ export function checkAndQueryARTEMovieInfo(url, successFunc, errorFunc = null) {
 * Checks if given url points to ZDF and triggers retrieval of movie info
 * @return {boolean} True if ZDF movie URL, False if other
 */
-export function checkAndQueryZDFMovieInfo(url, successFunc, errorFunc = null) {
+export function checkAndQueryZDFMovieInfo(url, successFunc, errorFunc) {
   let rc = false;
   if (url && url.indexOf("www.zdf.de") > -1) {
     // get ZDF Name id
@@ -71,7 +73,7 @@ export function checkAndQueryZDFMovieInfo(url, successFunc, errorFunc = null) {
 * Checks if given url points to ZDF and triggers retrieval of movie info
 * @return {boolean} True if ZDF movie URL, False if other
 */
-export function checkAndQuery3SATMovieInfo(url, successFunc, errorFunc = null) {
+export function checkAndQuery3SATMovieInfo(url, successFunc, errorFunc) {
   let rc = false;
   if (url && url.indexOf("www.3sat.de") > -1) {
     // get ZDF Name id
@@ -85,7 +87,7 @@ export function checkAndQuery3SATMovieInfo(url, successFunc, errorFunc = null) {
 
 
 
-// --------- ZDF/3SAT specific export functions -------------------------
+// --------- ZDF/3SAT specific functions -------------------------
 export function getZDF3SATImageURLFromJSON(json) {
   try {
     return json.teaserImageRef.layouts["768x432"];
@@ -148,41 +150,78 @@ export function getARTEExpiryStringFromJSON(json) {
   return rstr;
 }
 
+const arteQualityMap = new Map([
+  ["360p", 1],
+  ["720p", 2],
+  ["1080p", 3],
+]);
 
-export function getARTEStreamQuality(json, url) {
-  let maxidx = "";
-  let found = "";
-  try {
-    let maxheight = -1;
-    let sarr = json.data.attributes.streams;
-    for (const x in sarr) {
-      if (sarr[x].versionShortLibelle == "DE") {
-        if (sarr[x].url == url) {
-          found = x;
-          maxheight = sarr[x].height;
-        }
-        if (sarr[x].height > maxheight) {
-          maxheight = sarr[x].height;
-          maxidx = x;
-        }
-      }
-    }
-    if (found != "") {
-      if (sarr[found].height < maxheight) { // There is a better stream
-        found = -1;
-      }
-      else {
-        maxidx = found;
+function betterQuality(first, second) {
+  let x = arteQualityMap.has(first) ? arteQualityMap.get(first) : -1;
+  let y = arteQualityMap.has(second) ? arteQualityMap.get(second) : -1;
+  return x > y;
+}
+
+export function getARTEStreamQuality(json) {
+  let sarr = json;
+  let maxidx = -1;
+  let maxquality = -1;
+  let quality = "";
+  let omu = false;
+  let originalversion = false; // Originalfassung
+  let live = false;
+  for (const x in sarr) {
+    if (sarr[x].versions[0].shortLabel == "DE") {
+      quality = sarr[x].mainQuality.label;
+      if (betterQuality(quality, maxquality)) {
+        maxquality = quality;
+        maxidx = x;
       }
     }
   }
-  catch(err) {
-    // Do Nothing
+  if (maxidx == -1) {
+    for (const x in sarr) {
+      if (sarr[x].versions[0].shortLabel == "OmU" && sarr[x].versions[0].label.indexOf("deutsch") > -1) {
+        quality = sarr[x].mainQuality.label;
+        if (betterQuality(quality, maxquality)) {
+          maxquality = quality;
+          maxidx = x;
+          omu = true;
+        }
+      }
+    }
+  }
+  if (maxidx == -1) {
+    for (const x in sarr) {
+      if (sarr[x].versions[0].shortLabel == "OV") {
+        quality = sarr[x].mainQuality.label;
+        if (betterQuality(quality, maxquality)) {
+          maxquality = quality;
+          maxidx = x;
+          originalversion = true;
+        }
+      }
+    }
+  }
+  if (maxidx == -1) {
+    for (const x in sarr) {
+      if (sarr[x].versions[0].shortLabel == "liveDE") {
+        quality = sarr[x].mainQuality.label;
+        if (betterQuality(quality, maxquality)) {
+          maxquality = quality;
+          maxidx = x;
+          live = true;
+        }
+      }
+    }
   }
   return {
-    "found": found != "",
-    "quality": maxidx == "" ? null : sarr[maxidx].height + "p",
-    "stream": maxidx == "" ? null : sarr[maxidx].url
+    "found"  : (maxidx > -1),
+    "quality": maxidx > -1 ? sarr[maxidx].mainQuality.label : null,
+    "stream" : maxidx > -1 ? sarr[maxidx].url : null,
+    "omu"    : omu,
+    "live"   : live,
+    "ov"     : originalversion
   };
 }
 

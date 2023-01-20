@@ -184,7 +184,7 @@ function getARDInfoMovieListSuccess(response) {
     let ts = sender.getARDExpiryStringFromJSON(json);
     let imgsrc = sender.getARDImageURLFromJSON(json);
     let res = sender.getARDStreamQuality(json, currentQueryObj.getAttribute("data-url"));
-    updateMovieExpiryImageAndStream(ts, imgsrc, res.quality, (res.found ? null : res.stream));
+    updateMovieExpiryImageAndStream(ts, imgsrc, res.quality); // (res.found ? null : res.stream));
   }
   util.utilSetWait(false);
   showExtended(currentQueryObj, movieList, header);
@@ -196,8 +196,8 @@ function getARTEInfoMovieListSuccess(response) {
   if (json) {
     let ts = sender.getARTEExpiryStringFromJSON(json);
     let imgsrc = sender.getARTEImageURLFromJSON(json);
-    let res = sender.getARTEStreamQuality(json, currentQueryObj.getAttribute("data-url"));
-    updateMovieExpiryImageAndStream(ts, imgsrc, res.quality, (res.found ? null : res.stream));
+    let res = sender.getARTEStreamQuality(json.data.attributes.streams, currentQueryObj.getAttribute("data-url"));
+    updateMovieExpiryImageAndStream(ts, imgsrc, res.quality); // (res.found ? null : res.stream));
   }
   util.utilSetWait(false);
   showExtended(currentQueryObj, movieList, header);
@@ -217,7 +217,7 @@ function getZDF3SATInfoMovieListSuccess(response) {
 }
 
 
-function updateMovieExpiryImageAndStream(ts, imgurl, quality = null, stream = null, details = null) {
+function updateMovieExpiryImageAndStream(ts, imgurl, quality, stream, details) {
   if (details) {
     currentQueryObj.children[0].children[1].innerHTML = currentQueryObj.children[0].children[1].innerHTML + " (Folge: " + details + ")";
   }
@@ -1159,7 +1159,6 @@ function playbookmarkurl(event) {
 function playBookmarkResponse() {
   util.utilViewPopUp("Film wurde gestartet");
   util.utilSendHttpRequest("PATCH", gBookmarkServerUrl + "/api/bookmarks/" + bookList.currentCard.getAttribute("data-hash") + "/seen?seen=true", null, false, setCurrentSeen);
-  //setCurrentSeen();
 }
 
 

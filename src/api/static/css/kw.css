@@ -614,7 +614,7 @@ h3.container {
 }
 
 #wait {
-  animation: 0.3s waitmove 3s infinite;
+  animation: waitmove 3s linear 0.3s infinite;
   height: 100px;
   left: 50%;
   margin-left: -50px;

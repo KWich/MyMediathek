@@ -40,8 +40,7 @@ module.exports = function (grunt) {
               "**//*.css",
               "**//*.svg",
               "**//*.png",
-              "**//*.yaml",
-              "**//*.xpi",
+              "**//*.yaml"
             ],
             expand: true
           },
@@ -78,6 +77,7 @@ module.exports = function (grunt) {
               "uninstall.sh",
               "start.sh",
               "my*.sh",
+              "update*.sh",
             ],
             dest: 'scripts/',
             expand: true
@@ -100,7 +100,6 @@ module.exports = function (grunt) {
               "**//*.svg",
               "**//*.png",
               "**//*.yaml",
-              "**//*.xpi",
             ],
             expand: true
           },

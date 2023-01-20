@@ -3,7 +3,7 @@ goto :init
 
 
 :usage
-  echo Starte MyMediathek 0.9.1 (13/01/2023) - Optionen
+  echo Starte MyMediathek Vx.x - Optionen
   echo.
   echo   %__BAT_NAME% [flags]
   echo.
@@ -36,7 +36,7 @@ goto :init
 
 :main
 
-  echo Starte MyMediathek 0.9.1 (13/01/2023)
+  echo Starte MyMediathek Vx.x
   echo.
 
   if defined OptVerbose (

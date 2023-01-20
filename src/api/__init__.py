@@ -20,7 +20,7 @@ def printInfo():
   print ("\n Einstellungen:")
   print (" * INI Datei         : " + inifile)
   print (" * Database Datei    : " + dbname)
-  print (" * Bassisverzeichnis : " + str(basedir))
+  print (" * Basisverzeichnis  : " + str(basedir))
   print (" * Debugmodus        : " + ("aktiv" if cfgConfig.getboolean("develop","enable_debug_mode", fallback=False) else "inaktiv"))
   if cfgConfig.getboolean("develop","enable_swagger_ui", fallback=False):
     print (" * Swagger UI        : aktiv")
@@ -62,12 +62,9 @@ app.logger.setLevel(loglevel)
 log = logging.getLogger('werkzeug')
 log.setLevel(loglevel)
 
-# Build the Sqlite ULR for SqlAlchemy
-sqlite_url = "sqlite:///" + dbname
-
 # Configure the SqlAlchemy part of the app instance
 app.config["SQLALCHEMY_ECHO"] = False
-app.config["SQLALCHEMY_DATABASE_URI"] = sqlite_url
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + dbname
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Configure the Flask part of the app instance
