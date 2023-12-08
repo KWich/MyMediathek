@@ -6,7 +6,7 @@
 Das Verwaltungs- und erweiterte Konfigurationsseite kann von der Film- oder Merkliste aus über das Einstellungsmenü rechts oben (Zahnradsymbol) mit der Option "Verwaltung..." geöffnet werden:
 
 <p align="right">
-  <img src="images/VerwaltungMenue.png" alt="drawing" width=25%/>
+  <img src="images/Verwaltungmenue.png" alt="drawing" width=25%/>
 </p>
 
 
@@ -18,7 +18,7 @@ Die Seite ist in folgende Rubriken unterteilt:
 - [Erweiterungen](#browser-addons)
 
 <p align="center">
-  <img src="images/Screenshot Verwaltung.png" alt="drawing" width=50%/>
+  <img src="images/Verwaltungmenue2.png" alt="drawing" width=50%/>
 </p>
 
 <br><br>
@@ -94,6 +94,6 @@ Folgende Filter sind möglich:
 
 <br>
 
-## <a id="cfgAddon"></a>Browser Addons ##
+## <a id="cfgAddon"></a>Erweiterungen ##
 
 Hier stehen Links zum Laden der Browser Erweiterungen zur Verfügung (siehe auch [Webbrowser Add-On](../docs/addon.md)) 

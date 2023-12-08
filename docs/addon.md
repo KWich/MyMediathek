@@ -3,7 +3,7 @@
 [Übersicht](../README.MD) - [Installation](../docs/install.md) - [Bedienung](../docs/usage.md) -[Verwaltung und erweiterte Konfiguration](../docs/config.md) - Webbrowser Add-On - [Technische Details und Entwicklung](../docs/develop.md)
 ***
 
-Es steht ein Webbrowser Add-on "MyMediathek" für FireFox und Google Chrome zur Verfügung, mit dem die Beiträge von den Seiten der ARD, ZDF, 3SAT und ARTE Mediatheken direkt in die Merkliste übernommen oder mit dem Standardplayer abgespielt werden können.
+Für FireFox und Google Chrome steht jeweils ein Add-on(s) "MyMediathek" zur Verfügung, mit dem die Beiträge von den Seiten der ARD, ZDF, 3SAT und ARTE Mediatheken direkt in die Merkliste übernommen oder mit dem Standardplayer abgespielt werden können.
 
 Die Add-ons können direkt aus den entsprechenden Web Stores im Browser installiert werden:
 
@@ -13,13 +13,16 @@ Das Add-on steht auf der Mozilla Add-on Seite [https://addons.mozilla.org/de/fir
 - Google Chrome:<br>
 Das Add-on kann im "chrome web store" unter  [Home > Extensions > MyMediathek](https://chrome.google.com/webstore/detail/mymediathek/ddpljcidddmeigehfcdadcligkonkndk) heruntergeladen und installiert werden.
 
-Die Links auf die Add-ons stehen auch auf der Konfigurationsseite von 'MyMediathek' zur Verfügung (siehe [](../docs/config.md)).
+Die Links auf die Add-ons stehen auch auf der Konfigurationsseite von 'MyMediathek' zur Verfügung (siehe -> [Verwaltung und erweiterte Konfiguration > Erweiterungen](../docs/config.md#browser-addons).
 
-**Wichtig:** Nach der Installation **muss** noch die Serveradresse von 'MyMediathek' im Add-on konfiguriert werden, damit alle Funktionen zur Verfügung stehen.
+>**Wichtig:**
+>
+>***Nach der Add-on Installation **muss** noch die Serveradresse von 'MyMediathek' im Add-on konfiguriert werden, damit die Funktionen zur Verfügung stehen***.
+> 
 
 <br>
 
-## Konfiguration ##
+## Add-on Konfiguration ##
 
 <br>
 
