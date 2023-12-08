@@ -1,6 +1,6 @@
 ﻿# MyMediathek
 
-Übersicht - [Installation](docs/install.md) - [Bedienung](docs/usage.md) - [Verwaltung und erweiterte Konfiguration](docs/config.md) - [Firefox Add-On](docs/addon.md) - [Technische Details und Entwicklung](docs/develop.md)
+Übersicht - [Installation](docs/install.md) - [Bedienung](docs/usage.md) - [Verwaltung und erweiterte Konfiguration](docs/config.md) - [Webbrowser Add-On](docs/addon.md) - [Technische Details und Entwicklung](docs/develop.md)
 ***
 
 Mit MyMediathek können beliebige Beiträge aus den öffentlich-rechtlichen Mediatheken, wie ARD, ZDF, Arte, 3SAT, gesucht und in einer Merkliste abgespeichert werden, und sie dann später z.B. auf dem Fernseher wieder abzuspielen. 
@@ -19,11 +19,13 @@ Beiträge können mit Hilfe der Filter und Sortieroptionen ausgesucht und in der
 
 Aus der Merkliste können die gespeicherten Beiträge dann zu einem beliebigen Zeitpunkt entweder im Browser oder mit einem externen Player wie KODI oder VLC auf dem Fernseher abgespielt werden. 
 
-Alternativ können mit einem Firefox Add-On auch Beiträge im Browser direkt aus den Webseiten der ARD, ZDF, Arte, oder 3SAT Mediatheken in die lokale Merkliste übernommen werden:
+Alternativ können mit einem Webbrowser Add-On auch Beiträge im Browser direkt aus den Webseiten der ARD, ZDF, Arte, oder 3SAT Mediatheken in die lokale Merkliste übernommen werden:
 
 <p align="center">
   <img src="docs/images/Firefox5.png" alt="drawing" width=50%/>
 </p>
+
+Das Addon steht sowohl für Firefox als auch Chrome in den entsprechenden Web Stores zur Verfügung (für Download und Anleitung siehe [Webbrowser Add-On](docs/addon.md)).
 
 Damit wird eine individuelle Mediathek nach eigenen Vorlieben erstellt, die im Heimnetzwerk jederzeit auf allen Geräten zur Verfügung steht. Durch die flexible Weboberfläche passt sich die Darstellung an alle Bildschirmgrößen, wie z.B. dem Handy an:
 
@@ -41,7 +43,7 @@ Alle Informationen stehen allen Benutzern zentral zur Verfügung, ohne das diese
 - Anzeige von zusätzlichen Filminformationen wie Vorschaubild und Verfügbarkeit.
 - Abspeichern von Beiträgen in einer lokalen Merkliste mit freiwählbaren Kategorien. 
 - Farbige Markierungen für gemerkte und gesehene Filme, sowie für bald ablaufende bzw. abgelaufene Filme.
-- (Firefox) Add-on um Filminformation auch direkt aus den Webseiten der ARD, ZDF und ARTE Mediathek in die Merkliste zu übernehmen.
+- Add-on um Filminformation auch direkt aus den Webseiten der ARD, ZDF und ARTE Mediathek in die Merkliste zu übernehmen.
 - Flexible Darstellung für alle Bildschirmgrößen.
 
 <br><br>
@@ -52,6 +54,6 @@ Alle Informationen stehen allen Benutzern zentral zur Verfügung, ohne das diese
 - ## [Installation](docs/install.md) ##
 - ## [Bedienung](docs/usage.md) ##
 - ## [Verwaltung und erweiterte Konfiguration](docs/config.md) ##
-- ## [Firefox Add-On](docs/addon.md) ##
+- ## [Webbrowser Add-On](docs/addon.md) ##
 - ## [Technische Details und Entwicklung](docs/develop.md) ##
 

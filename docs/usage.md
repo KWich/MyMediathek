@@ -1,5 +1,5 @@
 ﻿# MyMediathek - Bedienung #
-[Übersicht](../README.MD) - [Installation](../docs/install.md) - Bedienung -[Verwaltung und erweiterte Konfiguration](../docs/config.md) - [Firefox Add-On](../docs/addon.md) - [Technische Details und Entwicklung](../docs/develop.md)
+[Übersicht](../README.MD) - [Installation](../docs/install.md) - Bedienung -[Verwaltung und erweiterte Konfiguration](../docs/config.md) - [Webbrowser Add-On](../docs/addon.md) - [Technische Details und Entwicklung](../docs/develop.md)
 ***
 
 Nach der Installation und Start kann mit dem Browser die Weboberfläche unter 'Rechneradresse:8081' aufgerufen werden (z.B. localhost:8081). Beim Aufruf wird die aktuelle Filmliste des [MediathekView Projekts](https://mediathekview.de/) angezeigt.

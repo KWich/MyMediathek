@@ -1,6 +1,6 @@
 ﻿# MyMediathek - Technische Details und Entwicklung
 
-[Übersicht](../README.MD) - [Installation](../docs/install.md) - [Bedienung](../docs/usage.md) -[Verwaltung und erweiterte Konfiguration](../docs/config.md) - [Firefox Add-On](../docs/addon.md) - Technische Details und Entwicklung
+[Übersicht](../README.MD) - [Installation](../docs/install.md) - [Bedienung](../docs/usage.md) -[Verwaltung und erweiterte Konfiguration](../docs/config.md) - [Webbrowser Add-On](../docs/addon.md) - Technische Details und Entwicklung
 ***
 
 ## Realisierung ##
@@ -18,7 +18,7 @@ Die Anwendung benutzt den in 'Flask' integrierten WebServer, der eigentlich für
 Falls mehr Leistung und Zuverlässigkeit benötigt wird, kann die Anwendung in einen regulären Web Server wie 'Apache' oder 'Nginx' integriert werden, entsprechende Information steht in der 'Flask' Dokumentation zur Verfügung. 
 
 #### HTTPS ####
-In der Standardkonfiguration bnutzt der Server HTTP. Falls HTTPS gebraucht wird, kann und sollte 'MyMediathek' hinter einem Reverse Proxy Server wie 'Nginx' betrieben werden, welches erfolgreich getestet wurde. 
+In der Standardkonfiguration benutzt der Server HTTP. Falls HTTPS gebraucht wird, kann und sollte 'MyMediathek' hinter einem Reverse Proxy Server wie 'Nginx' betrieben werden, welches erfolgreich getestet wurde. 
 
 ## Daten ##
 
@@ -90,7 +90,7 @@ Für Entwicklungs- und Testzwecke kann 'MyMediathek' unter Windows/Linux auch di
 
 ## Icons ##
 
-Das Projekt verwendet Icons, die dankenswerter Weise kostenlos von Ihren jeweiligen Authoren auf [freeicons.io](https://freeicons.io) zur Verfügung gestellt wurden:
+Das Projekt verwendet Icons, die dankenswerter Weise kostenlos von Ihren jeweiligen Autoren auf [freeicons.io](https://freeicons.io) zur Verfügung gestellt wurden:
 
 - [mithun](https://freeicons.io/profile/714): download-cloud.svg, gear.svg
 - [visuallanguage](https://freeicons.io/profile/3335): delete.svg

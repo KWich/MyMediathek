@@ -1,6 +1,6 @@
 ﻿# MyMediathek - Installation
 
-[Übersicht](../README.MD) - Installation - [Bedienung](../docs/usage.md) -[Verwaltung und erweiterte Konfiguration](../docs/config.md) - [Firefox Add-On](../docs/addon.md) - [Technische Details und Entwicklung](../docs/develop.md)
+[Übersicht](../README.MD) - Installation - [Bedienung](../docs/usage.md) -[Verwaltung und erweiterte Konfiguration](../docs/config.md) - [Webbrowser Add-On](../docs/addon.md) - [Technische Details und Entwicklung](../docs/develop.md)
 ***
 
 <br>
@@ -100,8 +100,8 @@ Nach der Installation steht der Befehl '**mymediathek**' zur Verfügung mit dem 
 ### Hinweise: ###
 - Das Installationsskript verwendet **'sudo'**, der Benutzer muss über die entsprechenden Rechte verfügen.
 - Das Installationsskript unterstützt 'apt' bzw. 'zypper' als Paketmanager (Debian oder openSuse basierte Distributionen. Falls ein anderer Paket Manager benutzt wird, müssen die notwendigen Python Pakete (python3, pip3, python-venv und python-dev bzw. python-devel) zuvor von Hand installiert werden. (Es ist nicht garantiert, dass das Installationsskript auf diesen Systemen reibungslos durchläuft, evtl. muß händisch nachkonfiguriert werden). Ansonsten die manuelle Installation wie unter [Alternative Linux Installation](#altLinux) beschreiben wurde verwenden.
-- Falls eine Firewall verwendet wird, muß in dieser der verwendete Port geöffnet werden, damit der Server von außerhalb erreichbar ist (z.B openSuse).
-- Bei manchen Distributionen (z.B. openSuse) kann es Schwirigkeiten geben, wenn ein eigener Benutzername für den  Server verwendet wird, da ein passwortloser Systemaccount nicht erstellt werden kann, bzw. beim Aufruf trotzdem ein Passwort anfordert. Hier für die Installation einen bestehenden User verwenden. Nachträglich kann der Benutzer mit folgendem Kommando noch geändert werden: 
+- Falls eine Firewall verwendet wird, muss in dieser der verwendete Port geöffnet werden, damit der Server von außerhalb erreichbar ist (z.B. openSuse).
+- Bei manchen Distributionen (z.B. openSuse) kann es Schwierigkeiten geben, wenn ein eigener Benutzername für den  Server verwendet wird, da ein passwortloser Systemaccount nicht erstellt werden kann, bzw. beim Aufruf trotzdem ein Passwort anfordert. Hier für die Installation einen bestehenden User verwenden. Nachträglich kann der Benutzer mit folgendem Kommando noch geändert werden: 
 >>  `sudo chown -R ich:users /opt/mymediathek`
 
 
@@ -115,7 +115,7 @@ Damit MyMediathek auf Windows ausgeführt wird, muss 'python3' mit 'pip' install
 
 1. Das bereitgestellte Archiv **myMediathek-win.zip** in ein temporäres Verzeichnis kopieren und in das gewünschte Zielverzeichnis extrahieren.
 
-2. Start- und Installationsskript '**start.bat**' starten. Das Script prüft ob die Vorausetzungen gegeben sind und erstellt beim ersten Lauf die notwendige Python Umgebung. Wenn die Umgebung existiert wird der Server gestartet, und die Webseite kann im Browser aufgerufen werden:
+2. Start- und Installationsskript '**start.bat**' starten. Das Script prüft ob die Voraussetzungen gegeben sind und erstellt beim ersten Lauf die notwendige Python Umgebung. Wenn die Umgebung existiert wird der Server gestartet, und die Webseite kann im Browser aufgerufen werden:
 <br><br>
 
 ---
@@ -147,7 +147,7 @@ Damit MyMediathek auf Windows ausgeführt wird, muss 'python3' mit 'pip' install
 > Einstellungen:
 > * INI Datei         : None
 > * Database Datei    : D:\MyMediathek\data\bookmarks.db
-> * Bassisverzeichnis : D:\MyMediathek\src
+> * Basisverzeichnis  : D:\MyMediathek\src
 > * Debugmodus        : inaktiv
 >
 >------------------------------------------------------
@@ -164,7 +164,7 @@ Damit MyMediathek auf Windows ausgeführt wird, muss 'python3' mit 'pip' install
 
 ### Hinweise: ###
 - Bei der Erstinstallation wird immer der Port 8081 für den Webserver gesetzt. Er kann anschließend über die Server.ini Datei geändert werden (siehe "Erweiterte Installation und Konfiguration").
-- Damit der Server von anderen Rechnern erreichbar ist muß eventuell der verwendete Port (Standard:8081) in der Windows Firewall freigegeben werden.
+- Damit der Server von anderen Rechnern erreichbar ist muss eventuell der verwendete Port (Standard:8081) in der Windows Firewall freigegeben werden.
 - Für eine ausführliche Ausgabe, z.B. zur Fehlersuche kann das Startskript mit der Option '-v' gestartet werden:
 
 >```
