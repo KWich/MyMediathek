@@ -53,16 +53,6 @@ goto :init
     goto end
   )
 
-  cmd /c pip3 --version  >nul 2>&1
-  if %errorlevel% equ 0 (
-    echo - PIP ist installiert
-  ) else (
-    echo.
-    echo Fehler: PIP3 ist nicht installiert bzw. nicht im Pfad vorhanden, kann nicht weitermachen
-    echo.        Bitte zuerst PIP3 installieren und dann erneut starten.
-    goto end
-  )
-
   set mydir=%~dp0
   if "%MYDIR:~-1%" == "\" set "MYDIR1=%MYDIR:~0,-1%"
   for %%f in ("%MYDIR1%") do set "myfolder=%%~nxf"
@@ -74,6 +64,15 @@ goto :init
   cd %basedir%
 
   IF NOT EXIST %basedir%\env\pyvenv.cfg (
+    cmd /c pip3 --version  >nul 2>&1
+    if %errorlevel% equ 0 (
+      echo - PIP ist installiert
+    ) else (
+      echo.
+      echo Fehler: PIP3 ist nicht installiert bzw. nicht im Pfad vorhanden, kann nicht weitermachen
+      echo.        Bitte zuerst PIP3 installieren und dann erneut starten.
+      goto end
+    )
     echo - Python Umgebung wird erstellt ...
     python -m venv env
     echo   ...fertig

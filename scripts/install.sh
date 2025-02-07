@@ -219,12 +219,12 @@ cd "$myInstallPath" || { echo " !! Kann Verzeichnis ${myInstallPath} nicht als A
 echo " * Aktuelles Verzeichnis ist Installationsverzeichnis $(pwd): Ok"
 echo " * Aktuelles Verzeichnis ist Installationsverzeichnis $(pwd): Ok"
 
-if [ -f "$myInstallPath/env/pyvenv.cfg" ]; then
+if [ -f "$myInstallPath/.venv/pyvenv.cfg" ]; then
   echo " * Python Umgebung existiert: Ok"
 else
   echo -n " * Python Umgebung wird angelegt ..."
-  ERROR=$(python3 -m venv env 2>&1 > /dev/null)
-  if [[  -z $ERROR && -f "$myInstallPath/env/pyvenv.cfg" ]]; then
+  ERROR=$(python3 -m venv .venv 2>&1 > /dev/null)
+  if [[  -z $ERROR && -f "$myInstallPath/.venv/pyvenv.cfg" ]]; then
     echo " Fertig"
   else
     printf "\n Anlegen der Umgebung ist fehlgeschlagen!! => Installation wird abgebrochen, ist Python 'venv' installiert?
@@ -234,7 +234,7 @@ else
 fi
 
 echo " * Python Umgebung wird aktiviert : Ok"
-source "${myInstallPath}"/env/bin/activate
+source "${myInstallPath}"/.venv/bin/activate
 echo -n " * Notwendige Python Komponenten werden installiert ..."
 ERROR=$(pip3 install -q --disable-pip-version-check -r "$currentDir"/scripts/python.requirements 2>&1 > /dev/null)
 if [[ -z "${ERROR}" ]]; then

@@ -1,40 +1,32 @@
 """
 Main module of MyMediathek server
+
+SPDX-FileCopyrightText: 2024 Klaus Wich <software@awasna.de>
+SPDX-License-Identifier: EUPL-1.2
 """
 
 import os
-import requests
-import flask
-import socket
 import sys
 import re
+import flask
 import click
+import requests
 
+from sqlalchemy.sql import text
 from flask import render_template
-from api import connex_app, db, dbname, cfgConfig
-from api.models import *
+from server import connex_app, db, APP_CONFIG, CONST_DBVERSION
 
-
-def get_ip():
-  s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-  s.settimeout(0)
-  try:
-      # doesn't even have to be reachable
-      s.connect(('10.254.254.254', 1))
-      IP = s.getsockname()[0]
-  except Exception:
-      IP = '127.0.0.1'
-  finally:
-      s.close()
-  return IP
 
 
 # perform necessary init functions
 def init():
+  # Read the swagger.yml file to configure the endpoints and db definitions
+  connex_app.add_api('swagger.yaml')
+
   # check if database file exists or create an empty one:
-  if not os.path.exists(dbname):
+  if not os.path.exists(APP_CONFIG.dbName):
     # check if data directory exists and is writable
-    cpath = os.path.dirname(dbname)
+    cpath = os.path.dirname(APP_CONFIG.dbName)
     if not os.path.exists(cpath):
       try:
         os.mkdir(cpath)
@@ -42,18 +34,16 @@ def init():
         sys.exit(f" ERROR: Database directory >{cpath}< does not exists and could not be created! -> Aborting")
 
     if not os.access(cpath, os.W_OK):
-      if os.path.exists(dbname):
-        if not os.access(dbname, os.W_OK):
-          sys.exit(f" ERROR: Database file >{dbname}< is not writable! -> Aborting")
+      if os.path.exists(APP_CONFIG.dbName):
+        if not os.access(APP_CONFIG.dbName, os.W_OK):
+          sys.exit(f" ERROR: Database file >{APP_CONFIG.dbName}< is not writable! -> Aborting")
       else:
         sys.exit(f" ERROR: Database directory >{cpath}< is not writable and no database file exists! -> Aborting")
-    
+
     with connex_app.app.app_context():
       db.create_all()
+      db.session.execute(text(f"PRAGMA user_version = {CONST_DBVERSION}"))
       db.session.commit()
-
-  # Read the swagger.yml file to configure the endpoints
-  connex_app.add_api('swagger.yaml')
 
 
 @connex_app.route('/')
@@ -75,8 +65,11 @@ method_requests_mapping = {
 @connex_app.route('/corsproxy/<path:url>', methods=method_requests_mapping.keys())
 def proxy(url):
   try:
-    requests_function = method_requests_mapping[flask.request.method]
-    request = requests_function(url, stream=True, params=flask.request.args)
+    url = url.replace('https:/','https://', 1)
+    url = url.replace('http:/','http://', 1)
+    url = url.replace(':///','://', 1)
+    requestsFunction = method_requests_mapping[flask.request.method]
+    request = requestsFunction(url, stream=True, params=flask.request.args)
     response = flask.Response(flask.stream_with_context(request.iter_content()),
                               content_type=request.headers['content-type'],
                               status=request.status_code)
@@ -90,26 +83,30 @@ def proxy(url):
     else:
       err = ""
     response = err, 500
-  finally:
-    return response
+  return response
 
 
-# If we're running in stand alone mode, run the application
+#  Run the application
 if __name__ == '__main__':
   init()
 
-  # Set Server mode:
-  # BM_SERVER_MODE = 1 : listens on all external interfaces
-  #                  0 or missing means use loopback interface
-  if cfgConfig.getboolean('general', 'servermode', fallback = True):
-    bmServerMode = '0.0.0.0'
-    serverip = get_ip();
-  else:
-    bmServerMode = '127.0.0.1'
-    serverip = bmServerMode;
-  bmServerPort = cfgConfig.get('general', 'serverport', fallback = 8081)
   #import pdb; pdb.set_trace()
   cli = sys.modules['flask.cli']
-  cli.show_server_banner = lambda *x: click.echo("\n------------------------------------------------------\nDie Webseite kann jetzt im Browser unter der Adresse\n    http://" + serverip + ":" + str(bmServerPort) +" geoeffnet werden.\n------------------------------------------------------\n\n")
+  cli.show_server_banner = lambda *x: click.echo("\n   --------------------------------------------------------" + \
+                                                 "\n    Die Webseite kann jetzt im Browser unter der Adresse" + \
+                                                f"\n    {APP_CONFIG.serverAddress} geoeffnet werden." + \
+                                                 "\n   --------------------------------------------------------\n")
 
-  connex_app.run(port=bmServerPort, host=bmServerMode, debug=cfgConfig.getboolean("develop","enable_debug_mode", fallback=None))
+  if APP_CONFIG.sslEnabled:
+    connex_app.run(
+                    port = APP_CONFIG.serverPort,
+                    host = "0.0.0.0" if APP_CONFIG.serverMode else "127.0.0.1",
+                    debug=APP_CONFIG.getboolean("develop","enable_debug_mode", fallback=None),
+                    ssl_context = APP_CONFIG.sslContext
+                  )
+  else:
+    connex_app.run(
+                    port = APP_CONFIG.serverPort,
+                    host = "0.0.0.0" if APP_CONFIG.serverMode else "127.0.0.1",
+                    debug = APP_CONFIG.getboolean("develop","enable_debug_mode", fallback=None)
+                  )

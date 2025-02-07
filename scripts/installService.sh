@@ -65,7 +65,7 @@ while true; do
 done
 
 printf "\n\n * Prüfe ob Python Environment vorhanden ist ... "
-if [ -f "$myInstallPath/env/pyvenv.cfg" ]; then
+if [ -f "$myInstallPath/.venv/pyvenv.cfg" ]; then
   echo ": Ok"
 else
   echo ": Fehler !! Python Environment wurde nicht gefunden !!"
@@ -93,7 +93,7 @@ Type=idle
 User=${myUser}
 Group=${myGroup}
 WorkingDirectory=${myInstallPath}
-ExecStart=${myInstallPath}/env/bin/python3 server/main.py
+ExecStart=${myInstallPath}/.venv/bin/python3 server/main.py
 Restart=on-failure
 
 [Install]

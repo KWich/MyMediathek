@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "0.9"
+  version: "1.0"
   title: "MyMediathek"
   description: "Interface to synchronize and provide bookmarked movies and handle movies."
 basePath: "/api"
@@ -14,7 +14,7 @@ tags:
 - name: "Moviestate"
   description: "Handle the state of movies, like seen and bookmarked. Allows state information to be read and updated for display."
 - name: "Subscription"
-  description: "Handle movie subscriptions, create, delete, get ..." 
+  description: "Handle movie subscriptions, create, delete, get ..."
 
 
 schemes:
@@ -28,7 +28,7 @@ paths:
       - "Info"
       summary: "Get information and configuration data"
       description: "Returns configuration data stored on the server, incuding player list and version info."
-      operationId: "api.interface.info_get" 
+      operationId: "server.interface.info_get"
       produces:
       - "application/json"
       responses:
@@ -77,12 +77,15 @@ paths:
                   minMovieStateAge:
                     type: "integer"
                     description: "Minimum age in days, before unused movie state can be deleted"
-                  expiryWarningDays:
+                  expiryBookmarkWarningDays:
                     type: "integer"
-                    description: "Number of days before expiry day, a movie gets a warning"
-                
-            example: 
-              { "name": "MyMediathek Server", "version": "0.9.2", "defaultplayer": -1, "players": [], "config": {"searchChannelInclude": ["ARD", "ZDF"],  "searchTitleFilter" : [], "searchTopicFilter": [], "minMovieStateAge" : 183, "expiryWarningDays" : 5}}
+                    description: "Number of days before expiry day, a movie in the bookmark list gets a warning"
+                  expiryMovieWarningDays:
+                    type: "integer"
+                    description: "Number of days before expiry day, a movie in the movie list gets a warning"
+
+            example:
+              { "name": "MyMediathek Server", "version": "1.0", "defaultplayer": -1, "players": [], "config": {"searchChannelInclude": ["ARD", "ZDF"],  "searchTitleFilter" : [], "searchTopicFilter": [], "minMovieStateAge": 183, "expiryBookmarkWarningDays": 5, "expiryMovieWarningDays": 10 }}
 
 
   /info/config:
@@ -90,7 +93,7 @@ paths:
       tags:
       - "Info"
       summary: "Change config data on server"
-      operationId: "api.interface.info_config_patch"
+      operationId: "server.interface.info_config_patch"
       consumes:
       - application/json
       parameters:
@@ -103,22 +106,22 @@ paths:
             name:
               type: "string"
               description: "A valid config parameter name"
-              enum: [minMovieStateAge, expiryWarningDays, searchChannelInclude, searchTitleFilter, searchTopicFilter]
+              enum: [minMovieStateAge, expiryBookmarkWarningDays, expiryMovieWarningDays, searchChannelInclude, searchTitleFilter, searchTopicFilter]
             value:
               type: "string"
       responses:
         "204":
           description: "successful operation"
-      
-      
-   
+
+
+
   /info/statistics:
     get:
       tags:
       - "Info"
       summary: "Get Server statistics"
       description: "Get details of stored data"
-      operationId: "api.interface.info_statistics_get" 
+      operationId: "server.interface.info_statistics_get"
       parameters:
       - name: "daysbefore"
         in: "query"
@@ -180,13 +183,13 @@ paths:
                   total:
                     type: integer
 
-  
+
   /bookmarks:
     post:
       tags:
       - "Bookmarks"
       summary: "Add new bookmark(s)"
-      operationId: "api.bookmark.bookmarks_post"
+      operationId: "server.bookmark.bookmarks_post"
       consumes:
       - "application/json"
       produces:
@@ -219,7 +222,7 @@ paths:
                       description: "Bookmark id from request. Java hash value of sender and url:<br>(java) int id = (sender + url).hashCode().abs()"
                     expiry:
                       type: "integer"
-                      description: "Expiry time stamp in seconds since since Jan 01 1970. If no expiry is set the value is 2000000000." 
+                      description: "Expiry time stamp in seconds since since Jan 01 1970. If no expiry is set the value is 2000000000."
         "400":
           description: "Invalid request, e.g. body syntax wrong"
         "422":
@@ -230,7 +233,7 @@ paths:
       - "Bookmarks"
       summary: "Retrieve bookmarks"
       description: "If no bookmarks are found an empty response is returned.<br><br>Optional filters:<ul><li>A category name can be specified as query parameter (e.g. '/bookmarks?category=China'), to retrieve only bookmarks with the requested category. If the category does not exit an error is returned, if no bookmarks with the category exist, an empty list is returned.</li><li>Sender name: It can be filtered with a optional sender name.</li></ul><b>Note: the filters can not be combined!</b><br><br>The optional sort parameter can be specified to force a sort, the direction can be inverted by setting the sub parameter desc."
-      operationId: "api.bookmark.bookmarks_get"
+      operationId: "server.bookmark.bookmarks_get"
       parameters:
       - name: "category"
         in: "query"
@@ -250,7 +253,7 @@ paths:
           * theme: Sort by theme (and title)<br>
           * title: Sort by title"
         type: "string"
-        enum: 
+        enum:
           - date
           - duration
           - expiry
@@ -285,7 +288,7 @@ paths:
       tags:
       - "Bookmarks"
       summary: "Delete bookmark(s) with given ids"
-      operationId: "api.bookmark.bookmarks_delete"
+      operationId: "server.bookmark.bookmarks_delete"
       consumes:
       - "application/json"
       produces:
@@ -308,16 +311,16 @@ paths:
           description: "No records deleted"
         "500":
           description: "Intenal error"
-          
-  /bookmarks/{id}:
+
+  /bookmarks/{hid}:
     delete:
       tags:
       - "Bookmarks"
       summary: "Delete given bookmark"
       description: ""
-      operationId: "api.bookmark.bookmarks_byId_delete"
+      operationId: "server.bookmark.bookmarksByIdDelete"
       parameters:
-      - name: "id"
+      - name: "hid"
         in: "path"
         description: "bookmark id to delete"
         required: true
@@ -338,20 +341,20 @@ paths:
                 description: True, means record was deleted
             example:
               { 'id': 1317922529 , 'deleted': true}
-            
+
         "404":
           description: "bookmark not found"
-  
+
     get:
       tags:
       - "Bookmarks"
       summary: "Get bookmark"
       description: "Get data for given bookmark."
-      operationId: "api.bookmark.bookmarks_byId_get"
+      operationId: "server.bookmark.bookmarksByIdGet"
       produces:
       - "application/json"
       parameters:
-      - name: "id"
+      - name: "hid"
         in: "path"
         description: "ID of the bookmark"
         required: true
@@ -372,11 +375,11 @@ paths:
       - "Bookmarks"
       summary: "Set additional bookmark information"
       description: "Set information parameters (e.g. category, expiry date) for given bookmark id."
-      operationId: "api.bookmark.bookmarks_byId_patch"
+      operationId: "server.bookmark.bookmarksByIdPatch"
       produces:
       - "application/json"
       parameters:
-      - name: "id"
+      - name: "hid"
         in: "path"
         description: "ID of the bookmark to update"
         required: true
@@ -396,7 +399,7 @@ paths:
                 description: "patch operation, only replace and remove are supported"
               name:
                 type: string
-                enum: [category, imgurl, videoformat, expiry] 
+                enum: [category, imgurl, videoformat, expiry]
                 description: "parameter name to be modified"
               value:
                 type: string
@@ -421,17 +424,17 @@ paths:
         "500":
           description: "player error, e.g. no player configured"
 
-  /bookmarks/{id}/seen:
+  /bookmarks/{hid}/seen:
     patch:
       tags:
       - "Bookmarks"
       summary: "Set bookmark seen information"
       description: "Set bookmark seen state to 'True' or 'False'"
-      operationId: "api.bookmark.bookmarks_byId_seen_patch"
+      operationId: "server.bookmark.bookmarksByIdSeenPatch"
       produces:
       - "application/json"
       parameters:
-      - name: "id"
+      - name: "hid"
         in: "path"
         description: "ID of the bookmark to update"
         required: true
@@ -442,23 +445,48 @@ paths:
         description: "seen state"
         required: true
         type: "boolean"
- 
+
       responses:
         "204":
           description: "successful operation"
 
+  /bookmarks/{hid}/valid:
+    patch:
+      tags:
+      - "Bookmarks"
+      summary: "Set bookmark to valid or invalid"
+      description: "Set bookmark valid state to 'True' or 'False'"
+      operationId: "server.bookmark.bookmarksByIdValidPatch"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "hid"
+        in: "path"
+        description: "ID of the bookmark to update"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "valid"
+        in: "query"
+        description: "valid state"
+        required: true
+        type: "boolean"
 
-  /bookmarks/{id}/expiry:
+      responses:
+        "204":
+          description: "successful operation"
+
+  /bookmarks/{hid}/expiry:
     get:
       tags:
       - "Bookmarks"
       summary: "Get bookmark expiry date from the webpage."
       description: "Get expiry date for given bookmark id from the webpage."
-      operationId: "api.bookmark.bookmarks_byId_expiry_get"
+      operationId: "server.bookmark.bookmarksByIdExpiryGet"
       produces:
       - "application/json"
       parameters:
-      - name: "id"
+      - name: "hid"
         in: "path"
         description: "ID of the bookmark"
         required: true
@@ -475,7 +503,7 @@ paths:
                 description: "Expiry time stamp in seconds since since Jan 01 1970."
             example:
              {"expiry" : 1636758000 }
-              
+
         "404":
           description: "bookmark not found"
         "422":
@@ -487,7 +515,7 @@ paths:
         - "Moviestate"
       summary: Returns a list of moviestates
       description: Returns moviestate<p>Optional filter parameter "before" can be used to return onlymoviestates older than the given date time stamp.<p>
-      operationId: api.interface.moviestate_get
+      operationId: server.interface.movieStateGet
       parameters:
         - name: before
           in: query
@@ -510,12 +538,12 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/moviestate"
-            
+
     post:
       tags:
       - "Moviestate"
       summary: "Get multiple states with ids"
-      operationId: "api.interface.moviestate_post"
+      operationId: "server.interface.movieStatePost"
       consumes:
       - "application/json"
       produces:
@@ -546,7 +574,7 @@ paths:
       - "Moviestate"
       summary: "Delete movie states older than a given days"
       description: "Delete movie states older days before current date. If the difference to today is less than 14 days the force flag must be set in the query."
-      operationId: "api.interface.moviestate_delete"
+      operationId: "server.interface.movieStateDelete"
       produces:
       - "application/json"
       parameters:
@@ -554,26 +582,21 @@ paths:
         in: "query"
         description: "Number of days before current date. If ommited a default from 183 days is assumed."
         type: "integer"
-      - name: "force"
-        in: "query"
-        description: "Force flag"
-        required: false
-        type: "boolean"
       responses:
         "200":
           description: "successful operation
           schema:
             $ref: "#/definitions/moviestate"
-  
-  /moviestate/{id}:
+
+  /moviestate/{hid}:
     get:
       tags:
         - "Moviestate"
-      summary: Return a movie state. 
+      summary: Return a movie state.
       description: Returns the current state for the given id.
-      operationId: api.interface.moviestate_id_get
+      operationId: server.interface.movieStateIdGet
       parameters:
-      - name: "id"
+      - name: "hid"
         in: "path"
         description: "Hash ID of the movie"
         required: true
@@ -587,17 +610,17 @@ paths:
             $ref: "#/definitions/moviestate"
         '404':
           description: "id not found"
-            
+
     patch:
       tags:
       - "Moviestate"
       summary: "Update/create state of movie"
       description: "Updates or creates a new entry in moviestate list for the given id, always returns success."
-      operationId: "api.interface.moviestate_id_patch"
+      operationId: "server.interface.movieStateIdPatch"
       consumes:
       - "application/json"
       parameters:
-      - name: "id"
+      - name: "hid"
         in: "path"
         description: "Hash ID of the movie to be updated/created in the movie state table"
         required: true
@@ -621,13 +644,13 @@ paths:
       summary: Returns a list of category names with the number of entries
       description: Returns the names of available categories with the number of entries in the book mark list.<p>Optional filter parameter min or max number can be used to return only categories with at least min resp. max number of entries.<p>
         <b>Note Only one filter can be applied in one call!</b><p>Returns an empty list if no (matching) categories are found.
-      operationId: api.interface.categories_get
+      operationId: server.interface.categories_get
       parameters:
-        - name: min
+        - name: minNb
           in: query
           description: min number of entries as filter
           type: integer
-        - name: max
+        - name: maxNb
           in: query
           description: max number of entries as filter
           type: integer
@@ -652,7 +675,7 @@ paths:
         - "Categories"
       summary: Delete given category
       description: ''
-      operationId: api.interface.categories_byname_delete
+      operationId: server.interface.categories_byname_delete
       parameters:
         - name: name
           in: path
@@ -668,13 +691,13 @@ paths:
           description: Category not found
 
 
-  /player: 
+  /player:
     post:
       tags:
       - Player
       summary: Add new player
       description: Add a new or modify an existing player.
-      operationId: api.interface.player_new
+      operationId: server.interface.player_new
       consumes:
       - application/json
       parameters:
@@ -720,7 +743,7 @@ paths:
         - Player
       summary: Delete given player
       description: ''
-      operationId: api.interface.player_delete
+      operationId: server.interface.player_delete
       parameters:
         - name: playerid
           in: path
@@ -739,7 +762,7 @@ paths:
         - Player
       summary: test the player connection and return result
       description: ''
-      operationId: api.interface.player_test
+      operationId: server.interface.player_test
       parameters:
         - name: playerid
           in: path
@@ -769,7 +792,7 @@ paths:
       tags:
       - Player
       summary: Play URL
-      operationId: api.interface.player_play
+      operationId: server.interface.player_play
       consumes:
       - application/json
       parameters:
@@ -781,7 +804,7 @@ paths:
         description: Movie address to be played
         schema:
           type: object
-          required: 
+          required:
             - url
           properties:
             url:
@@ -874,7 +897,7 @@ definitions:
         description: "indicates if the movie is in the bookmark table"
       expiry:
         type: "integer"
-        description: "Expiry time stamp in seconds since since Jan 01 1970. If no expiry is set the value is 5000000000." 
+        description: "Expiry time stamp in seconds since since Jan 01 1970. If no expiry is set the value is 5000000000."
     example: {"id" : 234323311, "seen" : true, "bookmarked": false, "expiry" : 1636758000 }
 
   id:

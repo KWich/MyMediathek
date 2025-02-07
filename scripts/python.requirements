@@ -11,3 +11,5 @@ setuptools>=40.8.0
 swagger_ui_bundle>=0.0.9
 urllib3
 werkzeug>=2.2.1
+PyChromecast
+pythonssl

@@ -4,9 +4,11 @@
 
 ### <a id="playerconfig"></a>Player Konfiguration ###
 
-MyMediathek unterstützt VLC und KODI als externe Player, wenn diese vom *Webserver* aus über HTTP erreichbar sind. Damit ist es zum Beispiel Filme über den Fernseher wiederzugeben, wenn KODI an diesen angeschlossen ist.
+MyMediathek unterstützt VLC und KODI als externe Player, wenn diese vom *Webserver* aus über HTTP erreichbar sind. Damit ist es zum Beispiel möglich Filme über den Fernseher wiederzugeben, wenn KODI an diesen angeschlossen ist.
 
-Ein Player wird im Verwaltungsmenü eingerichtet, durch Anklicken des plus Zeichens in der Sektion 'Konfigurierte Player' öffnet sich der Konfigurationsdialog:
+Ab Version 1.0 wird auch das Chromecast Protokoll unterstüzt. Damit können Filme direkt auf einen Chromecast fähigen Fernseher wiedergegeben werden (z.B. LG mit WebOS 24).
+
+Ein VLC oder KODI Player wird im Verwaltungsmenü eingerichtet, durch Anklicken des plus Zeichens in der Sektion 'Konfigurierte Player' öffnet sich der Konfigurationsdialog:
 
   <img src="docs/images/PlayerKonfiguration.png" alt="drawing" width="400"/>
 
@@ -21,7 +23,7 @@ Damit MyMediathek den Player ansprechen kann, muss dieser eine externe Steuerung
 #### **KODI Steuerung einrichten** ####
 
 - Im KODI muss unter 'Einstellungen'-'Dienste' die Steuerung über HTTP erlaubt werden:
-  
+
   <img src="docs/images/kodikonfiguration.png" alt="drawing" width="500"/>
 
 - In demselben Menü kann auch der Benutzername, Passwort und Port eingestellt werden.
@@ -35,6 +37,10 @@ Damit MyMediathek den Player ansprechen kann, muss dieser eine externe Steuerung
 
 - Im Menüpunkt 'Interface'-'Hauptinterfaces'-'LUA' sollte dann noch ein Passwort für den Zugriff festgelegt werden.
 - Der Standard Port für VLC ist 8080, er kann in den erweiterten Einstellungen über den Menüpunkt 'Eingang/Codecs' geändert werden (Nach unten scrollen bis die Netzwerkeinstellungen sichtbar werden und den 'HTTP Server Port' anpassen).
+
+
+#### **Chromecast einrichten** ####
+Ein Chromecastgerät wird über die Konfigurationsdatei eingerichtet, siehe [Verwaltung und erweiterte Konfiguration > Player Konfiguration](../docs/config.md#chromecast) für Details.
 
 
 <br><br>

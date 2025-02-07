@@ -18,7 +18,7 @@ Die Links auf die Add-ons stehen auch auf der Konfigurationsseite von 'MyMediath
 >**Wichtig:**
 >
 >***Nach der Add-on Installation **muss** noch die Serveradresse von 'MyMediathek' im Add-on konfiguriert werden, damit die Funktionen zur Verfügung stehen***.
-> 
+>
 
 <br>
 
@@ -48,7 +48,7 @@ Die Seite zur Verwaltung der Erweiterungen aufrufen, entweder über das Anwendun
 
 Die Seite zur Verwaltung der Erweiterungen aufrufen, entweder über das 'Einstellungsmenü -> Einstellungen -> Erweiterungen' oder in der Adressleiste 'chrome://extensions/' eingeben
 
-- In der Seite zum Add-on gehen und die Details des Add-ons aufrufen: 
+- In der Seite zum Add-on gehen und die Details des Add-ons aufrufen:
 
   <img src="images/Chrome0.png" alt="Chrome Erweiterungen" width="400"/>
 
@@ -73,24 +73,37 @@ Die Seite zur Verwaltung der Erweiterungen aufrufen, entweder über das 'Einstel
 
 ## Bedienung ##
 
-Das Add-on fügt auf den Seiten der unterstützten Mediatheken einen Kontext Menü Eintrag 'Filminformation anzeigen ...' hinzu mit dem die Details zu dem Beitrag in einem Seitenfenster angezeigt werden, und von wo aus der Beitrag entweder in der Merkliste gespeichert oder gleich im Standardplayer von 'MyMediathek' abgespielt werden kann. 
+Das Add-on fügt auf den Seiten der unterstützten Mediatheken Buttons und einen Kontext Menü Eintrag 'Filminformation anzeigen ...' hinzu mit dem die Details zu dem Beitrag in einem Seitenfenster angezeigt werden, und von wo aus der Beitrag entweder in der Merkliste gespeichert oder gleich im Standardplayer von 'MyMediathek' abgespielt werden kann.
+
+### Buttons ###
+
+  <img src="images/Firefox6.png" alt="drawing" width="450"/>
+
+  ***Hinweise***:<br>
+  - Es kann sein das ein Button nicht funktioniert, da der Filmbeitrag nicht identifziert wird, oder der Eintrag keinen Filmbeitrag beinhaltet. Dieses kann z.B. durch fehlerhafte Links und Markierungen in den Mediathekseiten passieren. Ind diesen Fällen nochmal mit dem Kontextmenü probieren.
+  - In der Arte Mediathek erscheinen die Buttons nur wenn die Filmdetails beim Darüberfahren angezeigt werden.
+  - In der 3SAT Mediathek werden keine Buttons unterstüzt.
+
+
+### Kontexteintrag ###
 
   <img src="images/Firefox4.png" alt="drawing" width="250"/>
-  
-***Hinweise***:<br>
-- *Der Kontextmenüeintrag wird mit der rechten Maustaste geöffnet.* 
-- *Der Kontextmenüeintrag wird den Links auf der Webseite hinzugefügt, nicht den Grafiken! Falls er bei einem Eintrag nicht sichtbar wird, ist entweder kein Link vorhanden oder dieser hat das falsche Format.*
-  
-Nach dem Anklicken erscheint die Seitenleiste mit den detaillierten Informationen zum gewählten Film:
 
-  <img src="images/Firefox5.png" alt="drawing" width="600"/> 
+***Hinweise***:<br>
+- *Der Kontextmenüeintrag wird mit der rechten Maustaste geöffnet.*
+- *Der Kontextmenüeintrag wird den Links auf der Webseite hinzugefügt, nicht den Grafiken! Falls er bei einem Eintrag nicht sichtbar wird, ist entweder kein Link vorhanden oder dieser hat das falsche Format.*
+
+Nach dem Anklicken erscheinen an der Seite die detaillierten Informationen zum gewählten Film:
+
+  <img src="images/Firefox5.png" alt="drawing" width="600"/>
 
 <br>
 
-Mit den entsprechenden Buttons kann dann der Film entweder direkt auf dem Standardplayer (z.B. Fernseher) abgespielt werden oder in der Merkliste für später gespeichert werden. 
+Mit den entsprechenden Buttons kann dann der Film entweder direkt auf dem Standardplayer (z.B. Fernseher) abgespielt werden oder in der Merkliste für später gespeichert werden.
 
-***Hinweis***:<br>
-- *Die Buttons sind nur verfügbar wenn der 'MyMediathek' Server konfiguriert und erreichbar ist.*
+***Hinweis***:
+
+- *Die Buttons sind nur verfügbar wenn der 'MyMediathek' Server konfiguriert und erreichbar ist.
 
 <br>
 

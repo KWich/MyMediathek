@@ -1,0 +1,16 @@
+version = 1
+
+[[annotations]]
+path = ["src/www/extensions/**", "src/www/**/*.html", "src/www/js/*", "src/www/css/*", "src/www/config/**", "scripts/**", "src/*.yaml"]
+SPDX-FileCopyrightText = "2025 Klaus Wich"
+SPDX-License-Identifier = "EUPL-1.2"
+
+[[annotations]]
+path = ["README.md", "docs/**", ".*", ".vscode/**", "es*", "grunt*", "pack*"]
+SPDX-FileCopyrightText = "2024 Klaus Wich"
+SPDX-License-Identifier = "CC-BY-1.0"
+
+[[annotations]]
+path = "src/www/images/*"
+SPDX-FileCopyrightText = "NONE"
+SPDX-License-Identifier = "CC-BY-1.0"

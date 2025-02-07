@@ -1,0 +1,14 @@
+[Unit]
+Description=My Mediathek Server
+After=network.target
+
+[Service]
+Type=idle
+User=mmservice
+Group=mmservice
+WorkingDirectory=/opt/mymediathek/
+ExecStart=/opt/mymediathek/.venv/bin/python3 server/main.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

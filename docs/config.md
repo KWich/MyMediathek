@@ -36,7 +36,11 @@ Hier werden statistische Daten zur Datenbank auf dem Server angezeigt und es bes
 
 MyMediathek unterstützt VLC und KODI als externe Player, wenn diese vom *Webserver* aus über HTTP erreichbar sind. Damit ist es zum Beispiel möglich Filme über den Fernseher wiederzugeben, wenn KODI an diesen angeschlossen ist.
 
-Ein Player wird im Verwaltungsmenü eingerichtet, durch Anklicken des plus Zeichens in der Sektion 'Konfigurierte Player' öffnet sich der Konfigurationsdialog:
+Ab Version 1.0 wird auch das Chromecast Protokoll unterstüzt. Damit können Filme direkt auf einen Chreomcast fähigen Fernseher wiedergegeben werden. (z.B. LG mit WebOS 24).
+
+
+### KODI und VLC Player Konfiguration ###
+KODI und/oder VLC Player werden im Verwaltungsmenü eingerichtet, durch Anklicken des plus Zeichens in der Sektion 'Konfigurierte Player' öffnet sich der Konfigurationsdialog:
 
   <img src="images/PlayerKonfiguration.png" alt="Player Konfiguration" width="400"/>
 
@@ -50,17 +54,17 @@ Damit MyMediathek den Player ansprechen kann, muss dieser eine externe Steuerung
 
 <br>
 
-### **KODI Steuerung einrichten** ###
+#### **KODI Steuerung einrichten** ####
 
 - Im KODI muss unter 'Einstellungen'-'Dienste' die Steuerung über HTTP erlaubt werden:
-  
+
   <img src="images/kodikonfiguration.png" alt="Kodi Konfiguration" width="500"/>
 
 - In demselben Menü kann auch der Benutzername, Passwort und Port eingestellt werden.
 
 <br>
 
-### **VLC Steuerung einrichten** ###
+#### **VLC Steuerung einrichten** ####
 - Im VLC muss in den erweiterten Einstellungen ('Werkzeuge'-'Einstellungen', hier 'Einstellungen anzeigen': alle auswählen) das Web Interface aktiviert werden:
 
   <img src="images/VLCMainInterface.png" alt="VlC Konfiguration" width="400"/>
@@ -72,6 +76,25 @@ Damit MyMediathek den Player ansprechen kann, muss dieser eine externe Steuerung
 
 <br>
 
+
+### <a id="chromecast"></a>**Chromecast Konfiguration** ###
+Zur Zeit kann ein Chromecast als Abspielgerät nur über die Konfigurationsdatei eingerichtet werden.
+Dazu muß in der Datei 'server.ini' der "Friendly Name" des Chromecast Gerätes eingetragen werden, z.B:
+```
+[execenv]
+chromeCastFriendlyName = "[LG] webOS TV OLED77C27LA"
+```
+
+Falls das Chromecast Gerät als Standardgerät verwendet werden soll, kann dieses mit folgendem Eintrag in der 'server.ini' erfolgen:
+```
+[general]
+default_player = cc
+```
+
+Siehe auch [Technische Details und Entwicklung > Erweiterte Server Konfiguration](../docs/develop.md#serverini)
+
+<br>
+
 ## <a id="mvfilter"></a>Standard Suchfilter ##
 
 Hier besteht die Möglichkeit Standardfilter für die Suche nach Beiträgen zu definieren, die verwendet werden, wenn in der Suchleiste nichts Gegenteiliges angegeben wird:
@@ -80,7 +103,7 @@ Hier besteht die Möglichkeit Standardfilter für die Suche nach Beiträgen zu d
 
 Folgende Filter sind möglich:
 
-- Durchsuchte Sender: 
+- Durchsuchte Sender:
 
   Hier kann eine Liste von Sendernamen angegeben werden, in denen nach Filmen gesucht wird ('Allowlist'). Der Sendername kann auch nur teilweise definiert werden, dann werden alle Sender die passen genommen, Z.B. 'ARTE' entspricht 'ARTE.de' und 'ARTE.fr', 'SR' gibt alle Beiträge von 'SR' und 'SRF' zurück.
 
@@ -90,10 +113,10 @@ Folgende Filter sind möglich:
 
 - Themenfilter:
 
-  Gleiche Funktion wie beim Titelfilter, nur für das Themenfeld. 
+  Gleiche Funktion wie beim Titelfilter, nur für das Themenfeld.
 
 <br>
 
 ## <a id="cfgAddon"></a>Erweiterungen ##
 
-Hier stehen Links zum Laden der Browser Erweiterungen zur Verfügung (siehe auch [Webbrowser Add-On](../docs/addon.md)) 
+Hier stehen Links zum Laden der Browser Erweiterungen zur Verfügung (siehe auch [Webbrowser Add-On](../docs/addon.md))

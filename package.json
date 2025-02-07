@@ -1,27 +1,29 @@
 {
   "name": "myMediathek",
-  "version": "0.9.3",
+  "version": "1.0.3",
+  "type": "module",
   "scripts": {
     "start": "run-script-os",
     "start:default": "echo 'not supported platform'",
     "start:win32": "scripts\\start.bat",
-    "start:linux": "scripts/start.sh"
+    "start:linux": "scripts/startdev.sh"
   },
   "devDependencies": {
-    "eslint": "^8.28.0",
-    "eslint-config-standard": "^17.0.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-n": "^15.5.1",
-    "eslint-plugin-promise": "^6.1.1",
-    "grunt": "^1.5.3",
-    "grunt-contrib-clean": "^2.0.1",
-    "grunt-contrib-compress": "^2.0.0",
-    "grunt-eslint": "^24.0.1",
-    "grunt-replace": "^2.0.2",
-    "grunt-stylelint": "^0.18.0",
-    "run-script-os": "^1.1.6",
-    "stylelint": "^14.16.1",
-    "stylelint-config-recommended": "^9.0.0",
-    "stylelint-config-standard": "^29.0.0"
+    "eslint": "^9.17.0",
+    "eslint-plugin-import": ">=2.26.0",
+    "grunt": ">=1.5.3",
+    "grunt-contrib-clean": ">=2.0.1",
+    "grunt-contrib-compress": ">=2.0.0",
+    "grunt-eslint": ">=24.0.1",
+    "grunt-exec": "^3.0.0",
+    "grunt-move": ">=2.0.0",
+    "grunt-replace": ">=2.0.2",
+    "grunt-run": ">=0.8.1",
+    "grunt-stylelint": ">=0.18.0",
+    "neostandard": "^0.12.0",
+    "run-script-os": ">=1.1.6",
+    "stylelint": ">=14.16.1",
+    "stylelint-config-recommended": ">=9.0.0",
+    "stylelint-config-standard": ">=29.0.0"
   }
 }
