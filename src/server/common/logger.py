@@ -11,19 +11,19 @@ import sys
 
 class Logger:
   """
-      Logger class.
+  Logger class.
   """
+
   FORMAT = " * %(asctime)s %(levelname)-5s: %(message)s"
   DATE = "%H:%M:%S"
   __log = None
   APP = "Mediathek"
 
-
   @staticmethod
   def getDefault():
     """
-        Return default instance of Logger
-        @return Logger
+    Return default instance of Logger
+    @return Logger
     """
     if Logger.__log is None:
       logger = logging.getLogger(Logger.APP)
@@ -40,31 +40,31 @@ class Logger:
   @staticmethod
   def warning(msg, *args):
     """
-        Log warning message
-        @parma msg as str
+    Log warning message
+    @parma msg as str
     """
     Logger.getDefault().warning(msg, *args)
 
   @staticmethod
   def debug(msg, *args):
     """
-        Log debug message
-        @parma msg as str
+    Log debug message
+    @parma msg as str
     """
     Logger.getDefault().debug(msg, *args)
 
   @staticmethod
   def info(msg, *args):
     """
-        Log info message
-        @parma msg as str
+    Log info message.
+    @parma msg as str
     """
     Logger.getDefault().info(msg, *args)
 
   @staticmethod
   def error(msg, *args):
     """
-        Log error message
-        @parma msg as str
+    Log error message.
+    @parma msg as str
     """
     Logger.getDefault().error(msg, *args)

@@ -6,15 +6,14 @@ SPDX-License-Identifier: EUPL-1.2
 """
 
 import time
+
 import connexion
-
 from flask import abort
-from sqlalchemy import select, delete, func, and_
+from sqlalchemy import and_, delete, func, select
 
-from server import db, APP_CONFIG, CONST_VERSION
-from server.models import Bookmark, NameNumber, NameNumberSchema, Category, MovieState, MovieStateSchema
-from server.player.mediaPlayer import MediaPlayer
-
+from server import APP_CONFIG, CONST_VERSION, db
+from server.models import Bookmark, Category, MovieState, MovieStateSchema, NameNumber, NameNumberSchema
+from server.player.mediaplayer import MediaPlayer
 
 
 def info_get():
@@ -26,18 +25,15 @@ def info_get():
     "version": CONST_VERSION,
     "players": APP_CONFIG.getPlayerInfoJSON(),
     "defaultplayer": APP_CONFIG.getDefaultPlayerIdx(),
-    "config": APP_CONFIG.getConfigDataJSON()
+    "config": APP_CONFIG.getConfigDataJSON(),
   }
 
 
 def info_config_patch():
   body = connexion.request.get_json() if connexion.request.is_json else connexion.request.get_data()
   if body:
-    result = APP_CONFIG.updateConfigValue(
-      body['name'],
-      body['value']
-    )
-    if result[0] != 200:
+    result = APP_CONFIG.updateConfigValue(body["name"], body["value"])
+    if result[0] != 200:  # noqa: PLR2004
       abort(result[0], result[1])
   else:
     abort(400, "No config data provided")
@@ -45,14 +41,14 @@ def info_config_patch():
 
 
 def info_statistics_get(daysbefore=183):
-  response = { "daysbefore": daysbefore, "tables" : [],  "bookmarks": {}, "moviestate": {}}
-  count = db.session.scalar(select(func.count()).select_from(Bookmark))
+  response = {"daysbefore": daysbefore, "tables": [], "bookmarks": {}, "moviestate": {}}
+  count = db.session.scalar(select(func.count()).select_from(Bookmark))  # pylint: disable=E1102
   response["tables"].append({"name": "bookmarks", "nb": count})
   response["bookmarks"]["number"] = count
-  count = db.session.scalar(select(func.count()).select_from(MovieState))
+  count = db.session.scalar(select(func.count()).select_from(MovieState))  # pylint: disable=E1102
   response["tables"].append({"name": "moviestate", "nb": count})
   response["moviestate"] = _getMstateStats(daysbefore, count)
-  count = db.session.scalar(select(func.count()).select_from(Category))
+  count = db.session.scalar(select(func.count()).select_from(Category))  # pylint: disable=E1102
   response["tables"].append({"name": "categories", "nb": count})
   response["bookmarks"]["categories"] = categories_get()
   response["bookmarks"]["station"] = _getStation()
@@ -61,28 +57,33 @@ def info_statistics_get(daysbefore=183):
 
 def _getStation():
   rlist = []
-  #import pdb; pdb.set_trace()
   data = db.session.scalars(select(Bookmark.sender).distinct()).all()
   for sender in data:
-    count = db.session.scalar(select(func.count()).select_from(Bookmark).where(Bookmark.sender == sender))
+    count = db.session.scalar(select(func.count()).select_from(Bookmark).where(Bookmark.sender == sender)) #pylint: disable=E1102
     rlist.append(NameNumber(sender, count))
   bmSchema = NameNumberSchema(many=True)
-  result = bmSchema.dump(rlist)
-  return result
+  return bmSchema.dump(rlist)
 
 
 # pylint: disable=singleton-comparison
 def _getMstateStats(days, count):
-  #import pdb; pdb.set_trace()
-  ts = int(round(time.time()*1000)) - days * 86400000
+  ts = int(round(time.time() * 1000)) - days * 86400000
   rlist = {}
   rlist["total"] = count
-  rlist["bookmarked"]  = _queryNbResult(select(MovieState).where(MovieState.bookmarked == True))
-  rlist["bookmarkedunseen"]  = _queryNbResult(select(MovieState).where(and_(MovieState.seen == False, MovieState.bookmarked == True)))
-  rlist["oldtotal"]  = _queryNbResult(select(MovieState).where(MovieState.modified < ts))
-  rlist["oldnotbookmarked"]  = _queryNbResult(select(MovieState).where(and_(MovieState.modified < ts,MovieState.bookmarked == False)))
-  rlist["bookmarkedactual"]  = _queryNbResult(select(MovieState).where(and_(MovieState.modified >= ts,MovieState.bookmarked == True)))
-  rlist["bookmarkedold"]  = _queryNbResult(select(MovieState).where(and_(MovieState.modified < ts,MovieState.bookmarked == True)))
+  rlist["bookmarked"] = _queryNbResult(select(MovieState).where(MovieState.bookmarked == True))  # noqa: E712
+  rlist["bookmarkedunseen"] = _queryNbResult(
+    select(MovieState).where(and_(MovieState.seen == False, MovieState.bookmarked == True))  # noqa: E712
+  )
+  rlist["oldtotal"] = _queryNbResult(select(MovieState).where(MovieState.modified < ts))
+  rlist["oldnotbookmarked"] = _queryNbResult(
+    select(MovieState).where(and_(MovieState.modified < ts, MovieState.bookmarked == False)) # noqa: E712
+  )
+  rlist["bookmarkedactual"] = _queryNbResult(
+    select(MovieState).where(and_(MovieState.modified >= ts, MovieState.bookmarked == True)) # noqa: E712
+  )
+  rlist["bookmarkedold"] = _queryNbResult(
+    select(MovieState).where(and_(MovieState.modified < ts, MovieState.bookmarked == True)) # noqa: E712
+  )
   return rlist
 
 
@@ -93,30 +94,27 @@ def _queryNbResult(query):
 
 # Category handling
 def categories_get(minNb=0, maxNb=-1):
-  """Returns the available categories
-  """
+  """Returns the available categories"""
   rlist = []
   for category in db.session.scalars(select(Category.name).order_by(Category.name)).all():
-    count = db.session.scalar(select(func.count()).select_from(Bookmark).where(Bookmark.category == category))
+    count = db.session.scalar(select(func.count()).select_from(Bookmark).where(Bookmark.category == category)) # pylint: disable=E1102
     if count >= minNb and (maxNb < 0 or count <= maxNb):
       rlist.append(NameNumber(category, count))
   # special case: w/o category
-  count = db.session.scalar(select(func.count()).select_from(Bookmark).where(Bookmark.category == None))
+  count = db.session.scalar(select(func.count()).select_from(Bookmark).where(Bookmark.category == None))  # noqa: E711 # pylint: disable=E1102
   if count >= minNb and (maxNb < 0 or count <= maxNb):
     rlist.append(NameNumber("@NULL", count))
   bmSchema = NameNumberSchema(many=True)
-  result = bmSchema.dump(rlist)
-  return result
+  return bmSchema.dump(rlist)
 
 
 def categories_byname_delete(name):
-  """Delete given category
-  """
+  """Delete given category"""
   data = db.session.execute(select(Category).filter_by(name=name)).one_or_none()
   if not data:
     abort(404, f"Category '{name}' does not exist")
   # check if bookmarks exist with category:
-  if db.session.scalar(select(func.count()).select_from(Bookmark).where(Bookmark.category == name)) > 0:
+  if db.session.scalar(select(func.count()).select_from(Bookmark).where(Bookmark.category == name)) > 0: # pylint: disable=E1102
     abort(403, f"Category '{name}' is in use")
   # delete record
   db.session.delete(data)
@@ -146,15 +144,12 @@ def movieStatePost():
         rec = MovieState(hid)
       rlist.append(rec)
   bmSchema = MovieStateSchema(many=True)
-  result = bmSchema.dump(rlist)
-  return result
+  return bmSchema.dump(rlist)
 
 
 def movieStateDelete(daysbefore=183):
-  #import pdb; pdb.set_trace()
-  ts = int(round(time.time()*1000)) - daysbefore * 86400000
-  #qo = MovieState.query.filter(MovieState.modified < ts, MovieState.bookmarked==False)
-  qo = delete(MovieState).where(and_(MovieState.modified < ts, MovieState.bookmarked == False))
+  ts = int(round(time.time() * 1000)) - daysbefore * 86400000
+  qo = delete(MovieState).where(and_(MovieState.modified < ts, MovieState.bookmarked == False)) # noqa: E712
   db.session.execute(qo)
   db.session.commit()
 
@@ -171,47 +166,45 @@ def movieStateIdPatch(hid, seen=False):
   if data:  # Data exists in Moviestate
     if data.seen != seen:
       data.seen = seen
-      data.modified = int(round(time.time()*1000))  # set timestamp
+      data.modified = int(round(time.time() * 1000))  # set timestamp
       if data.bookmarked:
         bdata = db.session.scalar(select(Bookmark).where(Bookmark.id == hid))
         if bdata.seen != seen:
           bdata.seen = seen
-        data.modified = int(round(time.time()*1000))  # set timestamp
-      else:
-        if not data.seen:
-          db.session.delete(data)
+        data.modified = int(round(time.time() * 1000))  # set timestamp
+      elif not data.seen:
+        db.session.delete(data)
   else:
-    db.session.add(MovieState(hid, seen, False, int(round(time.time()*1000))))
+    db.session.add(MovieState(hid, seen, False, int(round(time.time() * 1000))))
   db.session.commit()
 
 
 def player_play(playerid=None):
-  """ Direct play given movie url
-  """
+  """Direct play given movie url"""
   body = connexion.request.get_json() if connexion.request.is_json else connexion.request.get_data()
   if body:
-    url = body['url']
-    title = body['title'] if 'title' in body else None
-    ts = body['ts'] if 'ts' in body else int(round(time.time()))
+    url = body["url"]
+    title = body.get("title", None)
+    ts = body["ts"] if "ts" in body else int(round(time.time()))
     playresult = MediaPlayer.getInstance().playMovie(title, url, ts, playerid)
-    if playresult[0] != 200:
+    if playresult[0] != 200:  # noqa: PLR2004
       abort(playresult[0], "Film konnte nicht abgespielt werden - " + playresult[1])
   else:
     abort(400, "No URL provided")
 
 
 def player_new():
-  """ Add a new or modify an existing player
-  """
+  """Add a new or modify an existing player"""
   body = connexion.request.get_json() if connexion.request.is_json else connexion.request.get_data()
   if body:
-    error = APP_CONFIG.addPlayer( body['address'],
-                         body['port'] if 'port' in body else None,
-                         body['type'] if 'type' in body else None,
-                         body['name'] if 'name' in body else None,
-                         body['authentification'] if 'authentification' in body else None,
-                         body['default'] if 'default' in body else False
-                       )
+    error = APP_CONFIG.addPlayer(
+      body["address"],
+      body.get("port", None),
+      body.get("type", None),
+      body.get("name", None),
+      body.get("authentification", None),
+      body.get("default", False),
+    )
     if error:
       abort(error[0], error[1])
   else:
@@ -219,20 +212,16 @@ def player_new():
 
 
 def player_test(playerid):
-  """ Test the player connection
-  """
+  """Test the player connection"""
   testresult = MediaPlayer.getInstance().testMoviePlayer(playerid)
-  if testresult[0] > 299:
-    abort(testresult[0],testresult[1])
-  success = testresult[0] < 299
-  response = { "success" : success, "details": testresult[1] }
-  return response
+  if testresult[0] > 299:  # noqa: PLR2004
+    abort(testresult[0], testresult[1])
+  success = testresult[0] < 299  # noqa: PLR2004
+  return {"success": success, "details": testresult[1]}
 
 
 def player_delete(playerid):
-  """Delete given player
-  """
+  """Delete given player"""
   result = APP_CONFIG.deletePlayer(playerid)
-  #import pdb; pdb.set_trace()
-  if result[0] != 200:
+  if result[0] != 200:  # noqa: PLR2004
     abort(result[0], result[1])

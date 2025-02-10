@@ -1,0 +1,41 @@
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "ANN",
+
+  "COM812",
+
+  "D",
+
+  "EXE002",
+
+  "FBT002",
+  "FBT003",
+
+  "N802",
+  "N803",
+  "N806",
+  "N815",
+
+  "PTH118",
+
+  "SIM102",
+  "SIM105"
+]
+
+
+[tool.ruff]
+show-fixes = true
+indent-width = 2
+line-length = 120
+
+
+[tool.ruff.lint.pylint]
+max-args = 10
+max-statements = 75
+
+
+[tool.ruff.lint.mccabe]
+# Flag errors (`C901`) whenever the complexity level exceeds 5.
+max-complexity = 15

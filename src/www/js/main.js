@@ -171,7 +171,7 @@ function movieListToggleExtended(obj) {
       currentQueryObj = obj.currentTarget;
       let href = obj.currentTarget.children[2].children[2].href;
       extendnow = !(sender.checkAndQueryARDMovieInfo(href, getARDInfoMovieListSuccess, getInfoMovieListFailure) ||
-          sender.checkAndQueryARTEMovieInfo(href, getARTEInfoMovieListSuccess, getInfoMovieListFailure) ||
+          sender.checkAndQueryARTEMovieInfo(href, getARTEInfoMovieListSuccess, getInfoMovieListFailure, cfg.cfgCORS_ProxyServer) ||
           sender.checkAndQueryZDFMovieInfo(href, getZDF3SATInfoMovieListSuccess, getInfoMovieListFailure) ||
           sender.checkAndQuery3SATMovieInfo(href, getZDF3SATInfoMovieListSuccess, getInfoMovieListFailure));
     }

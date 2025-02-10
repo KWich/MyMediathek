@@ -6,18 +6,17 @@ SPDX-License-Identifier: EUPL-1.2
 """
 
 import time
-import connexion
 
+import connexion
 from flask import abort
 from sqlalchemy import func
 
 from server import db
 from server.models import Bookmark, BookmarkSchema, Category, MovieState, StateResult
-from server.utils import convertDate2Stamp, isInFutureDay
-from server.taskexpiry import getExpiry
-
+from server.utils import convertDate2Stamp, getExpiry, isInFutureDay
 
 CONST_FUTURE_VALUE = 5000000000
+
 
 def bookmarksByIdDelete(hid):
   """Delete given bookmarks
@@ -36,14 +35,14 @@ def bookmarksByIdDelete(hid):
     if sdata:
       if sdata.seen:
         sdata.bookmarked = False
-        sdata.modified = int(round(time.time()*1000)) # set timestamp
+        sdata.modified = int(round(time.time() * 1000))  # set timestamp
       else:
         # delete record
         db.session.delete(sdata)
     db.session.commit()
   else:
-    abort(404, { "id": hid, "message": "id does not exist" })
-  return { "id": hid, "deleted": True }
+    abort(404, {"id": hid, "message": "id does not exist"})
+  return {"id": hid, "deleted": True}
 
 
 def bookmarksByIdGet(hid):
@@ -57,18 +56,15 @@ def bookmarksByIdGet(hid):
   data = Bookmark.query.filter(Bookmark.id == hid).one_or_none()
   if not data:
     abort(404, f"Id '{hid}' does not exist")
-  #import pdb; pdb.set_trace()
   return BookmarkSchema().dump(data)
 
 
-def bookmarksByIdPatch(hid):
-  """Set bookmark info detail
-  """
+def bookmarksByIdPatch(hid):  # noqa: C901, PLR0912
+  """Set bookmark info detail"""
   fmod = False
   result = StateResult(hid)
   data = Bookmark.query.filter(Bookmark.id == hid).one_or_none()
   if data:
-    #import pdb; pdb.set_trace()
     if connexion.request.is_json:
       body = connexion.request.get_json()
       for entry in body:
@@ -81,7 +77,7 @@ def bookmarksByIdPatch(hid):
             elif value != data.category:
               data.category = value
               # check if category exists:
-              iscategory = Category.query.filter(Category.name==value).one_or_none()
+              iscategory = Category.query.filter(Category.name == value).one_or_none()
               if not iscategory:
                 db.session.add(Category(value))
               fmod = True
@@ -135,7 +131,7 @@ def bookmarksByIdPatch(hid):
 
       if fmod:
         result.state = True
-        data.modified = int(round(time.time())) # set timestamp
+        data.modified = int(round(time.time()))  # set timestamp
         db.session.commit()
 
     else:
@@ -148,13 +144,11 @@ def bookmarksByIdPatch(hid):
 
 
 def bookmarksByIdSeenPatch(hid, seen):
-  """Set bookmark seen flag """
+  """Set bookmark seen flag"""
   fmod = False
   data = Bookmark.query.filter(Bookmark.id == hid).one_or_none()
-  #import pdb; pdb.set_trace()
   if data:
     tstamp = int(round(time.time()))
-    #if seen != None and seen != data.seen:
     if seen not in (None, data.seen):
       data.seen = seen
       # update moviestate table:
@@ -164,10 +158,10 @@ def bookmarksByIdSeenPatch(hid, seen):
         db.session.add(mstatedata)
       else:
         mstatedata.seen = seen
-        mstatedata.modified = tstamp # set timestamp
+        mstatedata.modified = tstamp  # set timestamp
       fmod = True
     if fmod:
-      data.modified = tstamp # set timestamp
+      data.modified = tstamp  # set timestamp
       db.session.commit()
   else:
     result = StateResult(hid, False, f"Id '{hid}' does not exist")
@@ -175,17 +169,16 @@ def bookmarksByIdSeenPatch(hid, seen):
 
 
 def bookmarksByIdValidPatch(hid, valid):
-  """Set bookmark valid flag """
+  """Set bookmark valid flag"""
   fmod = False
   data = Bookmark.query.filter(Bookmark.id == hid).one_or_none()
-  #import pdb; pdb.set_trace()
   if data:
     tstamp = int(round(time.time()))
     if valid not in (None, data.valid):
       data.valid = valid
       fmod = True
     if fmod:
-      data.modified = tstamp # set timestamp
+      data.modified = tstamp  # set timestamp
       db.session.commit()
   else:
     result = StateResult(hid, False, f"Id '{hid}' does not exist")
@@ -203,26 +196,26 @@ def bookmarksByIdExpiryGet(hid):
   data = Bookmark.query.filter(Bookmark.id == hid).one_or_none()
   if not data:
     abort(404, f"Id '{hid}' does not exist")
-  #import pdb; pdb.set_trace()
   expiry = getExpiry(data.website)
   if not expiry:
     abort(404, "Kein Ablaufdatum auf der Webseite gefunden")
-  return { 'expiry' : expiry }
+  return {"expiry": expiry}
 
 
-def bookmarks_get(category=None, sender=None, sort=None, desc=False, limit=None, offset=None):
+def bookmarks_get(category=None, sender=None, sort=None, desc=False, limit=None, offset=None):  # noqa: C901, FBT002, PLR0912
   """Retrieve bookmarks
 
-  If no bookmarks are found an empty response is returned.  Optional a category name can be specified as query parameter (e.g. &#39;/bookmarks?category&#x3D;China&#39;), to retrieve only bookmarks with the requested category. If the category does not exit an error is returned, if no bookmarks with the category exist, an empty list is returned. # noqa: E501
+  If no bookmarks are found an empty response is returned.  Optional a category name can be specified as query parameter
+  (e.g./bookmarks?category&China), to retrieve only bookmarks with the requested category. If the category
+  does not exit an error is returned, if no bookmarks with the category exist, an empty list is returned.
 
   :param category: bookmark category
   :type category: str
 
   :rtype: List[Bookmark]
   """
-  # import pdb; pdb.set_trace()
   if category:
-    if category=="@NULL":
+    if category == "@NULL":
       # special case get all entries without category
       qo = Bookmark.query.filter(Bookmark.category is None)
     elif Category.query.filter(Category.name == category).one_or_none():
@@ -274,24 +267,15 @@ def bookmarks_get(category=None, sender=None, sort=None, desc=False, limit=None,
   return BookmarkSchema(many=True).dump(data) if data else {}
 
 
-def bookmarks_post():
-  """Add new bookmark(s)
-
-  :param body: Array/list of bookmark object(s) to be added to the database.
-               If an element already exists it will be overwritten if the modification date is older, otherwise the entry is ignored.
-               If mandatory elements are missing, an error is returned.
-  :type body: list | bytes
-
-  :rtype: None
-  """
+def bookmarks_post():  # noqa: C901, PLR0912
   body = connexion.request.get_json() if connexion.request.is_json else None
   if body:
     count = 0
     categories = []
-    response = { "nb":0, "detail":[] }
+    response = {"nb": 0, "detail": []}
     for entry in body:
       bm = Bookmark(**entry)
-      if bm.category and(not bm.category.strip() or bm.category == 'Keine Kategorie'):
+      if bm.category and (not bm.category.strip() or bm.category == "Keine Kategorie"):
         bm.category = None
       # get expiry date
       if not bm.expiry or bm.expiry <= 0:
@@ -306,7 +290,7 @@ def bookmarks_post():
             pass
         bm.expiry = nexp
       add = True
-      rec = Bookmark.query.filter(Bookmark.id==entry['id']).one_or_none()
+      rec = Bookmark.query.filter(Bookmark.id == entry["id"]).one_or_none()
       if rec:
         # check for overwrite
         if bm.modified > rec.modified:
@@ -316,25 +300,27 @@ def bookmarks_post():
           add = False
       if add:
         detail = {}
-        detail["id"] = entry['id']
+        detail["id"] = entry["id"]
         detail["expiry"] = bm.expiry if bm.expiry < CONST_FUTURE_VALUE else -1
         response["detail"].append(detail)
         # store category for checking
-        if bm.category and not bm.category in categories:
+        if bm.category and bm.category not in categories:
           categories.append(bm.category)
         # add to moviestate db:
-        data = MovieState.query.filter(MovieState.hashid==entry['id']).one_or_none()
+        data = MovieState.query.filter(MovieState.hashid == entry["id"]).one_or_none()
         if not data:
-          data = MovieState(entry['id'], entry['seen'] if 'seen' in entry else False, True, int(round(time.time()*1000)), bm.expiry)
+          data = MovieState(
+            entry["id"], entry.get("seen", False), True, int(round(time.time() * 1000)), bm.expiry
+          )
           db.session.add(data)
         else:
-          if 'seen' in entry:
-            data.seen = entry['seen']
+          if "seen" in entry:
+            data.seen = entry["seen"]
           data.bookmarked = True
-          data.modified = int(round(time.time()*1000))  # set timestamp
+          data.modified = int(round(time.time() * 1000))  # set timestamp
           if bm.expiry == CONST_FUTURE_VALUE:
             if data.expiry != CONST_FUTURE_VALUE:
-              bm.expiry = data.expiry   # take value from movie state
+              bm.expiry = data.expiry  # take value from movie state
           else:
             data.expiry = bm.expiry
           # no result, check if expiry exists in state db:
@@ -344,13 +330,12 @@ def bookmarks_post():
     if count > 0:
       # check for categories:
       for name in categories:
-        if not Category.query.filter(Category.name==name).one_or_none():
+        if not Category.query.filter(Category.name == name).one_or_none():
           newcat = Category(name)
           db.session.add(newcat)
       db.session.commit()
   else:
     abort(400, "Invalid body")
-  #import pdb; pdb.set_trace()
   return response
 
 
@@ -364,22 +349,21 @@ def bookmarks_delete():
   """
   if connexion.request.is_json:
     ids = connexion.request.get_json()
-    #import pdb; pdb.set_trace()
     count = 0
     dbchange = 0
     for idx in ids:
       # get record:
-      rec = Bookmark.query.filter(Bookmark.id==idx).one_or_none()
+      rec = Bookmark.query.filter(Bookmark.id == idx).one_or_none()
       if rec:
         db.session.delete(rec)
         dbchange = 1
         count += 1
       # update movie state if seen otherwise delete
-      data = MovieState.query.filter(MovieState.hashid==idx).one_or_none()
+      data = MovieState.query.filter(MovieState.hashid == idx).one_or_none()
       if data:
         if data.seen:
           data.bookmarked = False
-          data.modified = int(round(time.time()*1000))  # set timestamp
+          data.modified = int(round(time.time() * 1000))  # set timestamp
         else:
           db.session.delete(data)
         dbchange = 1
@@ -389,4 +373,4 @@ def bookmarks_delete():
       abort(404, "No records deleted")
   else:
     abort(400, "Not supported body")
-  return { 'nb' : count }
+  return {"nb": count}

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# (c) 2022-2023 Klaus Wich
+# (c) 2022-2024 Klaus Wich
 #
 # Install on Linux systems
 #
@@ -15,6 +15,7 @@
 readonly defaultPort=8081
 readonly defaultpath="/opt/mymediathek"
 readonly defaultscript="mymediathek"
+readonly defaultuser="mmservice"
 
 clear
 printf "\n=== Installation von %s ===\n\n" "MyMediathek Vx.x)"
@@ -111,7 +112,7 @@ fi
 
 # - prompt for user
 if [ -x "$(command -v apt)" ]; then
-  defaultServiceUser="mmservice"
+  defaultServiceUser=${defaultuser}
 else
   defaultServiceUser="${myUserName}"
 fi

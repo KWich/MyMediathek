@@ -5,13 +5,13 @@ Base DB V0.9 to V1.0
 
 SPDX-FileCopyrightText: 2025 Klaus Wich <software@awasna.de>
 SPDX-License-Identifier: EUPL-1.2
-"""
+"""  # noqa: INP001
 
-import sqlite3
 import os
+import sqlite3
 import sys
+from pathlib import Path
 from shutil import copyfile
-
 
 CONST_DBVERSION = 3
 
@@ -39,21 +39,18 @@ CONST_DBVERSION = 3
 
 
 def createNewBookmarkRecordSql(rec):
-  newsql = f'INSERT INTO bookmarks VALUES ({rec[0]},{rec[1]},"{rec[2]}", \
+  return f'INSERT INTO bookmarks VALUES ({rec[0]},{rec[1]},"{rec[2]}", \
                                           "{rec[3]}","{equote(rec[4])}","{rec[5]}","{rec[6]}","{equote(rec[7])}", \
                                           {rec[8]},{rec[9]},"{rec[10]}",{rec[11]},{rec[12]}, \
-                                          "{rec[13]}","{rec[14]}","{rec[15]}", True)'
-  return newsql
+                                          "{rec[13]}","{rec[14]}","{rec[15]}", True)'  # noqa: S608
 
 
 def createCategoryRecordSql(rec):
-  newsql = f'INSERT INTO categories VALUES ("{rec[0]}",{rec[1]},{rec[2]},{rec[3]})'
-  return newsql
+  return f'INSERT INTO categories VALUES ("{rec[0]}",{rec[1]},{rec[2]},{rec[3]})'  # noqa: S608
 
 
 def createMoviestateRecordSQL(rec):
-  newsql = f'INSERT INTO moviestate VALUES ({rec[0]},{rec[1]},{rec[2]},{rec[3]},{checkNone(rec[4])})'
-  return newsql
+  return f"INSERT INTO moviestate VALUES ({rec[0]},{rec[1]},{rec[2]},{rec[3]},{checkNone(rec[4])})"  # noqa: S608
 
 
 def checkNone(rec):
@@ -62,7 +59,7 @@ def checkNone(rec):
 
 def equote(qrec):
   if qrec is not None:
-    return qrec.replace('"','-')
+    return qrec.replace('"', "-")
   return "NULL"
 
 
@@ -71,53 +68,46 @@ def findtemplate(dirname, sname):
   for entry in os.scandir(dirname):
     if entry.is_dir():
       result = findtemplate(entry, sname)
-    else:
-      if os.path.basename(entry) == sname:
-        result = os.path.abspath(entry)
+    elif Path(entry).name == sname:
+      result = os.path.abspath(entry)  # noqa: PTH100
     if result:
       break
   return result
 
 
 
-if __name__ == '__main__':
-  basepath = sys.argv[1] if len (sys.argv) > 1 else os.getcwd()
-  print("   - Update Datenbasis:")
+if __name__ == "__main__":
+  basepath = sys.argv[1] if len (sys.argv) > 1 else Path.cwd()
+  print("   - Update Datenbasis:")  # noqa: T201
 
-  if len (sys.argv) > 2:
-    dataBaseName = sys.argv[2]
-  else:
-    # Try to use db in standard directoy:
-    dataBaseName = basepath + "/data/bookmarks.db"
+  database_name = sys.argv[2]  if len (sys.argv) > 2 else basepath + "/data/bookmarks.db"  # noqa: PLR2004
 
-  if not os.path.exists(dataBaseName):
-    print(f"       Datenbasis {dataBaseName} exisitiert nicht => Abbruch")
+  if not Path(database_name).exists:
+    print(f"       Datenbasis {database_name} exisitiert nicht => Abbruch")  # noqa: T201
     sys.exit(0)
 
   # Check version of db:
-  connection = sqlite3.connect(dataBaseName)
+  connection = sqlite3.connect(database_name)
   version = connection.cursor().execute("PRAGMA user_version").fetchone()[0]
   connection.close()
   if version >= CONST_DBVERSION:
-    print(f"     => Datenbasis {dataBaseName} ist bereits auf neuem Stand")
+    print(f"     => Datenbasis {database_name} ist bereits auf neuem Stand")  # noqa: T201
     sys.exit(0)
-
-  dataPath = os.path.dirname(dataBaseName)
 
   template = findtemplate(basepath + "/scripts", "bookmarks-template.db")
-  if not template or not os.path.exists(template):
-    print("        Templatedatei wurde nicht gefunden => Abbruch")
+  if not template or not Path(template).exists:
+    print("        Templatedatei wurde nicht gefunden => Abbruch")  # noqa: T201
     sys.exit(0)
 
-  origdb = dataBaseName + ".orig"
-  copyfile(dataBaseName, origdb)
+  origdb = database_name + ".orig"
+  copyfile(database_name, origdb)
 
-  copyfile(template,dataBaseName)
+  copyfile(template,database_name)
 
   connection = sqlite3.connect(origdb)
   cursor = connection.cursor()
 
-  connection_new = sqlite3.connect(dataBaseName)
+  connection_new = sqlite3.connect(database_name)
   cursor_new = connection_new.cursor()
 
   # Bookmark table:
@@ -141,4 +131,4 @@ if __name__ == '__main__':
   # Verbindung beenden
   connection.close()
   connection_new.close()
-  print(f"     => Datenbasis: {dataBaseName} wurde auf Version {CONST_DBVERSION} aktualisert")
+  print(f"     => Datenbasis: {database_name} wurde auf Version {CONST_DBVERSION} aktualisert")  # noqa: T201

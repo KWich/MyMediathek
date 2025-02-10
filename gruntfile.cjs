@@ -185,7 +185,7 @@ module.exports = function (grunt) {
           patterns: [
             {
               match: /cVERSION=".+"/g,
-              replacement: "cVERSION=\"<%= pkg.version %>\""
+              replacement: "cVERSION=\"<%= pkg.version %> (<%= grunt.template.today('dd/mm/yyyy') %>)\""
             }
           ]
         },

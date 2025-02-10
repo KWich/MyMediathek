@@ -1,13 +1,19 @@
-/**
+/*
  * Sender specific export functions
- **/
+ *
+ * SPDX-FileCopyrightText: 2024 Klaus Wich*
+ * SPDX-License-Identifier: EUPL-1.2
+ */
+
 "use strict";
 
 import {utilSendHttpRequest} from "./util.js";
-import {cfgCORS_ProxyServer} from "../config/config.js";
 
 const cZDF_BEARER_TOKEN = "20c238b5345eb428d01ae5c748c5076f033dfcc7";
 const c3SAT_BEARER_TOKEN = "13e717ac1ff5c811c72844cebd11fc59ecb8bc03";
+
+const cARTE_BASE_URL = "https://api.arte.tv/api/player/v2/config/de/";
+
 
 /**
 * Checks if given url points to ARD and triggers retrieval of movie info
@@ -16,10 +22,13 @@ const c3SAT_BEARER_TOKEN = "13e717ac1ff5c811c72844cebd11fc59ecb8bc03";
 export function checkAndQueryARDMovieInfo(url, successFunc, errorFunc) {
   let rc = false;
   if (url && url.includes("ardmediathek")) {
-    let idx = url.indexOf("video/");
-    if (idx > -1) {
-      let id = url.substring(idx + 6);
-      utilSendHttpRequest("GET", "https://api.ardmediathek.de/page-gateway/pages/ard/item/" + id, null, false, successFunc, errorFunc);
+    // get ARD id
+    let id = url.substring(url.lastIndexOf("/") + 1);
+    if (id.length < 2 && !isNaN(id)) {
+      id = url.substring(url.lastIndexOf("/", url.lastIndexOf("/") - 1) + 1, url.lastIndexOf("/"));
+    }
+    if (id.length > 5) {
+      utilSendHttpRequest("GET", "https://api.ardmediathek.de/page-gateway/pages/ard/item/" + id + "?embedded=false&mcV6=true", null, false, successFunc, errorFunc);
       rc = true;
     }
   }
@@ -31,7 +40,7 @@ export function checkAndQueryARDMovieInfo(url, successFunc, errorFunc) {
 * Checks if given url points to ARTE and triggers retrieval of movie info
 * @return {boolean} True if ARTE movie URL, False if other or error in url occurred
 */
-export function checkAndQueryARTEMovieInfo(url, successFunc, errorFunc) {
+export function checkAndQueryARTEMovieInfo(url, successFunc, errorFunc, proxy) {
   let rc = false;
   if (url && url.includes("www.arte.tv")) {
     // get ARTE id
@@ -42,8 +51,11 @@ export function checkAndQueryARTEMovieInfo(url, successFunc, errorFunc) {
       if (idx > -1) {
         surl = surl.substring(0, idx);
         if (surl.length > 5 && !surl.includes("fernsehfilme")) {
-          //let addheader = {name: "X-Requested-With", content: "MyMediathek"};
-          utilSendHttpRequest("GET", cfgCORS_ProxyServer + "https://api.arte.tv/api/player/v2/config/de/" + surl + "?platform=ARTE_NEXT", null, false, successFunc, errorFunc);
+          let addr = cARTE_BASE_URL + surl;
+          if (proxy) {
+            addr = proxy + addr;
+          }
+          utilSendHttpRequest("GET", addr, null, false, successFunc, errorFunc);
           rc = true;
         }
       }
@@ -59,12 +71,16 @@ export function checkAndQueryARTEMovieInfo(url, successFunc, errorFunc) {
 */
 export function checkAndQueryZDFMovieInfo(url, successFunc, errorFunc) {
   let rc = false;
-  if (url && url.includes("www.zdf.de") && url.endsWith(".html")) {
-    // get ZDF Name id
-    let surl = url.substring(19, url.length - 5);
-    let addheader = {name: "Api-Auth", content: "Bearer " + cZDF_BEARER_TOKEN};
-    utilSendHttpRequest("GET", "https://api.zdf.de/content/documents/zdf/" + surl + ".json?profile=player-3", null, false, successFunc, errorFunc, addheader);
-    rc = true;
+  if (url) {
+    let idx = url.indexOf("#");
+    let zurl = idx == -1 ? url : url.substring(0, idx);
+    if (zurl.includes("www.zdf.de") && zurl.endsWith(".html")) {
+      // get ZDF Name id
+      let surl = zurl.substring(19, zurl.length - 5);
+      let addheader = {name: "Api-Auth", content: "Bearer " + cZDF_BEARER_TOKEN};
+      utilSendHttpRequest("GET", "https://api.zdf.de/content/documents/zdf/" + surl + ".json", null, false, successFunc, errorFunc, addheader);
+      rc = true;
+    }
   }
   return rc;
 }
@@ -79,7 +95,7 @@ export function checkAndQuery3SATMovieInfo(url, successFunc, errorFunc) {
   if (url && url.includes("www.3sat.de") && url.endsWith(".html")) {
     let surl = url.substring(20, url.length - 5);
     let addheader = {name: "Api-Auth", content: "Bearer " + c3SAT_BEARER_TOKEN};
-    utilSendHttpRequest("GET", "https://api.3sat.de/content/documents/zdf/" + surl + ".json?profile=player2", null, false, successFunc, errorFunc, addheader);
+    utilSendHttpRequest("GET", "https://api.3sat.de/content/documents/zdf/" + surl + ".json", null, false, successFunc, errorFunc, addheader);
     rc = true;
   }
   return rc;
@@ -99,20 +115,31 @@ export function getZDF3SATImageURLFromJSON(json) {
 
 /** Format dd/mm/yyyy => verfügbar bis:<br>dd.mm.yyyy */
 export function getZDF3SATExpiryStringFromJSON(json) {
-  let rstr = null;
+  let result = null;
   try {
     let date = json.mainVideoContent["http://zdf.de/rels/target"].visibleTo;
+
     if (date) {
       let yyyy = date.substring(0, 4);
       let mm = date.substring(5, 7);
       let dd = date.substring(8, 10);
-      rstr = dd + "." + mm + "." + yyyy;
+      result = dd + "." + mm + "." + yyyy;
+    }
+    else {
+      let ed = json.tracking.nielsen.content.nol_c19;
+      if (ed) {
+        let eda = ed.split("|");
+        date = eda[2];
+        if (date) {
+          result = date.substring(0, 10);
+        }
+      }
     }
   }
   catch {
-    // Do Nothing
+    //pass
   }
-  return rstr;
+  return result;
 }
 
 
@@ -126,7 +153,7 @@ export function getZDF3SATepisodeFromJSON(json) {
 }
 
 
-// --------- ARTE specific export functions -------------------------
+// --------- ARTE specific functions -------------------------
 export function getARTEImageURLFromJSON(json) {
   return json.data.attributes.metadata.images[0].url;
 }
@@ -172,6 +199,8 @@ export function getARTEStreamQuality(json) {
   let omu = false;
   let originalversion = false; // Originalfassung
   let live = false;
+  let fremdsprache = null;
+
   for (const x in sarr) {
     if (sarr[x].versions[0].shortLabel == "DE") {
       quality = sarr[x].mainQuality.label;
@@ -188,6 +217,7 @@ export function getARTEStreamQuality(json) {
         if (betterQuality(quality, maxquality)) {
           maxquality = quality;
           maxidx = x;
+          fremdsprache = sarr[x].versions[0].label;
           omu = true;
         }
       }
@@ -217,17 +247,29 @@ export function getARTEStreamQuality(json) {
       }
     }
   }
+  if (maxidx == -1) {
+    for (const x in sarr) {
+      quality = sarr[x].mainQuality.label;
+      if (betterQuality(quality, maxquality)) {
+        maxquality = quality;
+        maxidx = x;
+        fremdsprache = sarr[x].versions[0].label;
+      }
+    }
+  }
   return {
     "found": maxidx > -1,
     "quality": maxidx > -1 ? sarr[maxidx].mainQuality.label : null,
     "stream": maxidx > -1 ? sarr[maxidx].url : null,
     "omu": omu,
     "live": live,
-    "ov": originalversion
+    "ov": originalversion,
+    "sprache": fremdsprache
   };
 }
 
-// --------- ARD specific export functions -------------------------
+
+// --------- ARD specific functions -------------------------
 export function getARDImageURLFromJSON(json) {
   let imgurl = json.widgets[0].image.src;
   let idx = imgurl.indexOf("?");
@@ -262,32 +304,41 @@ export function getARDStreamQuality(json, url) {
   let maxquality = -1;
   let found = -1;
   let sarr;
-  if (json.widgets[0].mediaCollection) {
-    sarr = json.widgets[0].mediaCollection.embedded._mediaArray[0]._mediaStreamArray;
-    for (let k = 0; k < sarr.length; k++) {
-      if (sarr[k]._stream == url) {
-        found = k;
-        maxquality = sarr[k]._quality;
+  try {
+    if (json.widgets[0].mediaCollection) {
+      sarr = json.widgets[0].mediaCollection.embedded.streams[0].media;
+      if (sarr) {
+        for (let k = 0; k < sarr.length; k++) {
+          if (sarr[k].url == url) {
+            found = k;
+            maxquality = sarr[k].maxVResolutionPx;
+          }
+          if (sarr[k].maxVResolutionPx > maxquality) {
+            found = k;
+            maxquality = sarr[k].maxVResolutionPx;
+            maxidx = k;
+          }
+        }
       }
-      if (sarr[k]._quality > maxquality) {
-        maxquality = sarr[k]._quality;
-        maxidx = k;
+      if (found > -1) {
+        if (sarr[found].maxVResolutionPx < maxquality) { // There is a better stream
+          found = -1;
+        }
+      }
+      else {
+        maxidx = found;
       }
     }
   }
-  if (found > -1) {
-    if (sarr[found]._quality < maxquality) { // There is a better stream
-      found = -1;
-    }
-    else {
-      maxidx = found;
-    }
+  catch {
+    found = -1;
+    maxidx = -1;
   }
 
   // Map quality:
   return {
     "found": found > -1,
-    "quality": maxidx > -1 ? sarr[maxidx]._height + "p" : null,
-    "stream": maxidx > -1 ? sarr[maxidx]._stream : null
+    "quality": maxidx > -1 ? sarr[maxidx].maxVResolutionPx + "p" : null,
+    "stream": maxidx > -1 ? sarr[maxidx].url : null
   };
 }

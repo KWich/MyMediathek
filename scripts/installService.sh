@@ -85,7 +85,7 @@ sudo touch "${serviceFile}"
 sudo chmod a+w "${serviceFile}"
 sudo cat << EOF > "${serviceFile}"
 [Unit]
-Description=My Mediathek Server
+Description=${myServiceName} server
 After=network.target
 
 [Service]

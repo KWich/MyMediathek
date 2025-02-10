@@ -6,13 +6,14 @@ SPDX-License-Identifier: EUPL-1.2
 """
 
 from marshmallow import fields
+
 from server import db, ma
 
 
 class Bookmark(db.Model):
-  __tablename__ = 'bookmarks'
+  __tablename__ = "bookmarks"
 
-  id = db.Column(db.Integer, primary_key=True, sqlite_on_conflict_unique='IGNORE')
+  id = db.Column(db.Integer, primary_key=True, sqlite_on_conflict_unique="IGNORE")
   modified = db.Column(db.Integer)
   sender = db.Column(db.String())
   thema = db.Column(db.String())
@@ -31,7 +32,7 @@ class Bookmark(db.Model):
   valid = db.Column(db.Boolean(), default=True)
 
   def __repr__(self):
-    return f'Bookmark {self.id}'
+    return f"Bookmark {self.id}"
 
   def save(self):
     db.session.add(self)
@@ -42,7 +43,25 @@ class BookmarkSchema(ma.Schema):
   class Meta:
     model = Bookmark
     sqla_session = db.session
-    fields = ('id','sender','titel','thema','modified','category','url','description','duration','sendtime','seen','expiry','note','website','imgurl','videoformat','valid')
+    fields = (
+      "id",
+      "sender",
+      "titel",
+      "thema",
+      "modified",
+      "category",
+      "url",
+      "description",
+      "duration",
+      "sendtime",
+      "seen",
+      "expiry",
+      "note",
+      "website",
+      "imgurl",
+      "videoformat",
+      "valid",
+    )
 
 
 class BMNumber:
@@ -72,45 +91,43 @@ class NameNumberSchema(ma.Schema):
 
 
 class Category(db.Model):
-  __tablename__ = 'categories'
+  __tablename__ = "categories"
 
   name = db.Column(db.String, primary_key=True)
-  modified  = db.Column(db.Integer(), default=0)
+  modified = db.Column(db.Integer(), default=0)
   fontcolor = db.Column(db.Integer(), default=-1)
   backgroundcolor = db.Column(db.Integer(), default=-1)
 
-  def __init__(self, name, backgroundcolor=-1, fontcolor = -1, modified = 0):
+  def __init__(self, name, backgroundcolor=-1, fontcolor=-1, modified=0):
     self.name = name
     self.modified = modified
     self.fontcolor = fontcolor
     self.backgroundcolor = backgroundcolor
 
   def __repr__(self):
-    return f'{self.name}'
+    return f"{self.name}"
 
   def serialize(self):
-    return {"name": self.name,
-            "modified": self.modified
-           }
+    return {"name": self.name, "modified": self.modified}
 
 
 class CategorySchema(ma.Schema):
   class Meta:
     model = Category
     sqla_session = db.session
-    fields = ('name','modified','fontcolor','backgroundcolor')
+    fields = ("name", "modified", "fontcolor", "backgroundcolor")
 
 
 class MovieState(db.Model):
-  __tablename__ = 'moviestate'
+  __tablename__ = "moviestate"
 
-  hashid = db.Column(db.Integer, primary_key=True, sqlite_on_conflict_unique='IGNORE')
+  hashid = db.Column(db.Integer, primary_key=True, sqlite_on_conflict_unique="IGNORE")
   seen = db.Column(db.Boolean())
   bookmarked = db.Column(db.Boolean())
-  modified  = db.Column(db.Integer)
-  expiry  = db.Column(db.Integer)
+  modified = db.Column(db.Integer)
+  expiry = db.Column(db.Integer)
 
-  def __init__(self, hashid, seen=False, bookmarked=False, modified = 0, expiry = 0):
+  def __init__(self, hashid, seen=False, bookmarked=False, modified=0, expiry=0):
     self.hashid = hashid
     self.seen = seen
     self.bookmarked = bookmarked
@@ -126,7 +143,7 @@ class MovieStateSchema(ma.Schema):
   class Meta:
     model = MovieState
     sqla_session = db.session
-    fields = ('hashid','seen','bookmarked','modified','expiry')
+    fields = ("hashid", "seen", "bookmarked", "modified", "expiry")
 
 
 class StateResult:
@@ -136,10 +153,7 @@ class StateResult:
     self.errmsg = errmsg
 
   def __repr__(self):
-    return "<CategoryState({self.id!r}:{self.state!r})>".format(self=self)
+    return f"<CategoryState({self.id!r}:{self.state!r})>"
 
   def serialize(self):
-    return {"id": self.id,
-            "state": self.state,
-            "errmsg" : self.errmsg
-           }
+    return {"id": self.id, "state": self.state, "errmsg": self.errmsg}

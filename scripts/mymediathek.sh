@@ -1,22 +1,21 @@
 #!/usr/bin/env bash
 #
-# (c) 2022-2023 Klaus Wich
-#
-# Control program installation
+# Server Control program
 #
 # SPDX-FileCopyrightText: 2024 Klaus Wich <software@awasna.de>
 # SPDX-License-Identifier: EUPL-1.2
 
 clear
 
-cVERSION="1.0.3"
-
-echo
-echo "=== MyMediathek ${cVERSION} ==="
-echo
-
+readonly cVERSION="1.0.4 (10/02/2025)"
 readonly defaultTitle="MyMediathek"
 readonly defaultscript="mymediathek"
+
+echo
+echo "=== ${defaultTitle} V${cVERSION} ==="
+echo
+
+
 
 update() {
   if [[ -f ${1} ]]; then
@@ -65,6 +64,7 @@ update() {
   fi
 }
 
+
 serviceStatus() {
   echo " - Installationsverzeichnis     : $myInstallPath"
   echo " - Benutzer                     : $myUser"
@@ -108,12 +108,13 @@ serviceStatus() {
   ip4addr=$(hostname -I| cut -d ' ' -f1)
   echo " - Server Addresse              : ${ip4addr}:${portnumber}"
 
-  procno=`ps -ef | grep ${myInstallPath}/start.sh -m1 | grep -v grep | tr -s ' '  | cut -d  ' ' -f2`
-  if [[ ! -z "${procno}" ]]; then
+  procno=$(pgrep -fo "${myInstallPath}/start.sh")
+  if [[ -n "${procno}" ]]; then
     echo
-    echo " - ${defaultTitle} Process          : aktiv im Vordergrund, stop mit 'mymediathek stop'"
+    echo " - ${defaultTitle} Process          : aktiv im Vordergrund, stop möglich mit '$defaultscript stop'"
   fi
 }
+
 
 startService() {
   serviceFiles=$(find "$myInstallPath"/scripts/ -maxdepth 1 -type f -name "*.service")
@@ -139,6 +140,7 @@ startService() {
   fi
 }
 
+
 stopService() {
   serviceFiles=$(find "$myInstallPath"/scripts/ -maxdepth 1 -type f -name "*.service")
   if [ -z "$serviceFiles" ]; then
@@ -157,6 +159,7 @@ stopService() {
     fi
   fi
 }
+
 
 restartService() {
   serviceFiles=$(find "$myInstallPath"/scripts/ -maxdepth 1 -type f -name "*.service")
@@ -189,6 +192,7 @@ restartService() {
   fi
 }
 
+
 serviceLog() {
   if [ -n "$1" ] && [ "$1" -eq "$1" ] 2>/dev/null; then
     count="$1"
@@ -218,9 +222,15 @@ execute() {
 
 
 stop() {
-  procno=`ps -ef | grep ${myInstallPath}/start.sh -m1 | grep -v grep | tr -s ' '  | cut -d  ' ' -f2`
-  if [[ ! -z "${procno}" ]]; then
-    sudo kill -9 ${procno}
+  procno=$(pgrep -fo "${myInstallPath}/start.sh")
+  if [[ -n "${procno}" ]]; then
+    #echo "kill -9 ${procno}"
+    sudo kill -9 "${procno}"
+    procno=$(pgrep -fo "${myInstallPath}/server/main.py")
+    if [[ -n "${procno}" ]]; then
+      #echo "kill -9 ${procno}"
+      sudo kill -9 "${procno}"
+    fi
     echo "${defaultTitle} wurde gestopped"
   else
     echo "${defaultTitle} ist nicht im Vordergrund aktiv"
@@ -268,19 +278,19 @@ checkversion() {
   printf "  Suche nach neuer Version:\n\n"
   packagefile=$(wget -qO- ${cPACKAGEFILE})
   if [[ $packagefile =~ "\"version\":" ]]; then
-    v=$(echo ${packagefile} | cut -d , -f 2)
+    v=$(echo "${packagefile}" | cut -d , -f 2)
     v1=${v/\"version\":/}
     v2=${v1//\"/}
     version=${v2// /}
     if [[ $version > ${cVERSION} ]]; then
-      printf "  Version ${version} verfügbar in GitHub ist neuer als die eigene Version ${cVERSION}\n\n   => Bitte aktualiseren\n\n"
+      printf "  Version ${version} verfügbar in GitHub ist neuer als die eigene Version %s\n\n   => Bitte aktualiseren\n\n", ${cVERSION}
     else
-      printf "  Keine neuere Version verfügbar in GitHub\n\n  - eigene Version ${cVERSION}\n  - GitHub version ${version}\n\n"
+      printf "  Keine neuere Version verfügbar in GitHub\n\n  - eigene Version %s\n  - GitHub version %s\n\n", ${cVERSION}, "${version}"
     fi
   else
     printf "   Konnte keine Remote Version finden\n"
   fi
-  printf "  (Github URL: ${cGITHUB})\n"
+  printf "  (Github URL: %s)\n", ${cGITHUB}
 }
 
 
@@ -304,8 +314,8 @@ else
   script="${BASH_SOURCE[0]}"
 fi
 scriptDir=$(cd "$(dirname "${script}")" &> /dev/null && pwd)
-myInstallPath="$(dirname "$scriptDir")"
-myUser=$(stat -c "%U" "$script")
+myInstallPath="$(dirname "${scriptDir}")"
+myUser=$(stat -c "%U" "${script}")
 
 case "${1}" in
   "run"                         ) execute;;
@@ -313,11 +323,11 @@ case "${1}" in
   "startService"                ) startService;;
   "stopService"                 ) stopService;;
   "restartService"              ) restartService;;
-  "uninstall"                   ) "$scriptDir"/uninstall.sh;;
+  "uninstall"                   ) "${scriptDir}"/uninstall.sh;;
   "checkversion"                ) checkversion;;
   "update"                      ) update "${2}";;
-  "installService"              ) "$scriptDir"/installService.sh;;
-  "removeService"               ) "$scriptDir"/removeService.sh;;
+  "installService"              ) "${scriptDir}"/installService.sh;;
+  "removeService"               ) "${scriptDir}"/removeService.sh;;
   "searchCC"                    ) searchCC;;
   "-s" | "status"               ) serviceStatus;;
   "-l" | "serviceLog"           ) serviceLog "${2}";;

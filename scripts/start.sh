@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# (c) 2022-2023 Klaus Wich
+# (c) 2022-2024 Klaus Wich
 
 echo " Starte MyMediathek Vx.x:"
 
@@ -11,7 +11,7 @@ basedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source "${basedir}/.venv/bin/activate"
 
 # set environment variables for database:
-export BM_DBFILE=$basedir/data/bookmarks.db
+#export BM_DBFILE=$basedir/data/bookmarks.db
 
 #start server
 python3 "${basedir}/server/main.py"

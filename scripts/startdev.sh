@@ -25,7 +25,7 @@ else
 fi
 
 # set environment variables for database:
-export BM_DBFILE=$basedir/data/bookmarks.db
+#export BM_DBFILE=$basedir/data/bookmarks.db
 
 #start server
 python3 "${basedir}/src/main.py"
